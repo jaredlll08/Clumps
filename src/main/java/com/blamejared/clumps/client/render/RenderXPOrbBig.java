@@ -47,10 +47,10 @@ public class RenderXPOrbBig extends Render<EntityXPOrbBig> {
 			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) k, (float) l);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			float f8 = 255.0F;
-			float f9 = ((float) entity.xpColor + partialTicks) / 5.0F;
-			l = (int) ((MathHelper.sin(f9 + 0.0F) + 1.0F) * 0.5F * 255.0F);
+			float f9 = ((float) entity.xpColor) / 2.0F;
+			l = (int) ((MathHelper.sin(f9 + 1) + 1.0F)  * 255);
 			int i1 = 255;
-			int j1 = (int) ((MathHelper.sin(f9 + 4.1887903F) + 1.0F) * 0.1F * 255.0F);
+			int j1 = 0xFFFFFF;//(int) ((MathHelper.sin(f9 + 4.1887903F) + 1.0F) * 255.0F);
 			GlStateManager.translate(0.0F, 0.1F, 0.0F);
 			GlStateManager.rotate(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
 			GlStateManager.rotate((float) (this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);

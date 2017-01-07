@@ -3,6 +3,7 @@ package com.blamejared.clumps;
 import com.blamejared.clumps.proxy.CommonProxy;
 import com.blamejared.clumps.reference.Reference;
 import com.teamacronymcoders.base.BaseModFoundation;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.*;
 
@@ -32,7 +33,6 @@ public class Clumps extends BaseModFoundation<Clumps> {
 		super.init(event);
 		PROXY.registerRenders();
 		PROXY.registerEvents();
-		
 	}
 	
 	@Override
