@@ -36,7 +36,7 @@ repositories {
     }
 }
 dependencies {
-    compile "com.teamacronymcoders.base:base:1.10.2-1.2.0-Snapshot.96:deobf"
+    compile "com.teamacronymcoders.base:base:1.10.2-1.2.1-Snapshot.101:deobf"
 }
 
 processResources
