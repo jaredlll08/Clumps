@@ -3,11 +3,10 @@ package com.blamejared.clumps;
 import com.blamejared.clumps.proxy.CommonProxy;
 import com.blamejared.clumps.reference.Reference;
 import com.teamacronymcoders.base.BaseModFoundation;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.*;
 
-@Mod(modid = Reference.MODID, name = Reference.NAME, version = Reference.VERSION)
+@Mod(modid = Reference.MODID, name = Reference.NAME, version = Reference.VERSION, dependencies = Reference.DEPENDECIES)
 public class Clumps extends BaseModFoundation<Clumps> {
 	
 	
@@ -26,6 +25,7 @@ public class Clumps extends BaseModFoundation<Clumps> {
 	public void preInit(FMLPreInitializationEvent event) {
 		super.preInit(event);
 	}
+	
 	
 	@Override
 	@Mod.EventHandler
