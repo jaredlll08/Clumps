@@ -12,6 +12,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.*;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class EntityXPOrbBig extends EntityXPOrb {
@@ -37,6 +38,10 @@ public class EntityXPOrbBig extends EntityXPOrb {
 	 * The closest EntityPlayer to this orb.
 	 */
 	private EntityPlayer closestPlayer;
+	/**
+	 * The closest EntityXPOrbBig to this orb.
+	 */
+	private EntityXPOrbBig closestOrb;
 	/**
 	 * Threshold color for tracking players
 	 */
@@ -127,8 +132,12 @@ public class EntityXPOrbBig extends EntityXPOrb {
 		if(this.xpTargetColor < this.xpColor - 20 + this.getEntityId() % 100) {
 			if(this.closestPlayer == null || this.closestPlayer.getDistanceSqToEntity(this) > 64.0D) {
 				this.closestPlayer = this.worldObj.getClosestPlayerToEntity(this, 8.0D);
+				this.closestOrb =null;
 			}
 			
+			if((closestPlayer == null && closestOrb == null) || (this.closestOrb !=null && this.closestOrb.getDistanceSqToEntity(this) > 64)) {
+				this.closestOrb = getClosestOrb(posX, posY, posZ, 8);
+			}
 			this.xpTargetColor = this.xpColor;
 		}
 		
@@ -149,7 +158,21 @@ public class EntityXPOrbBig extends EntityXPOrb {
 				this.motionY += d2 / d4 * d5 * 0.1D;
 				this.motionZ += d3 / d4 * d5 * 0.1D;
 			}
+		} else 	if(this.closestPlayer == null && this.closestOrb !=null) {
+			double d1 = (this.closestOrb.posX - this.posX) / 8.0D;
+			double d2 = (this.closestOrb.posY + (double) this.closestOrb.getEyeHeight() / 2.0D - this.posY) / 8.0D;
+			double d3 = (this.closestOrb.posZ - this.posZ) / 8.0D;
+			double d4 = Math.sqrt(d1 * d1 + d2 * d2 + d3 * d3);
+			double d5 = 1.0D - d4;
+			
+			if(d5 > 0.0D) {
+				d5 = d5 * d5;
+				this.motionX += d1 / d4 * d5 * 0.1D;
+				this.motionY += d2 / d4 * d5 * 0.1D;
+				this.motionZ += d3 / d4 * d5 * 0.1D;
+			}
 		}
+		
 		
 		this.moveEntity(this.motionX, this.motionY, this.motionZ);
 		float f = 0.98F;
@@ -171,8 +194,8 @@ public class EntityXPOrbBig extends EntityXPOrb {
 		if(this.xpOrbAge >= 6000) {
 			this.setDead();
 		}
-		if(worldObj.getTotalWorldTime()%5 ==0) {
-			List<EntityXPOrbBig> orbs = worldObj.getEntitiesWithinAABB(EntityXPOrbBig.class, new AxisAlignedBB(posX - 2, posY - 2, posZ - 2, posX + 2, posY + 2, posZ + 2));
+		if(worldObj.getTotalWorldTime() % 1 == 0) {
+			List<EntityXPOrbBig> orbs = worldObj.getEntitiesWithinAABB(EntityXPOrbBig.class, new AxisAlignedBB(posX - 2.5, posY - 2.5, posZ - 2.5, posX + 2.5, posY + 2.5, posZ + 2.5));
 			int newSize = 0;
 			if(orbs.size() > 0) {
 				EntityXPOrbBig orb = orbs.get(worldObj.rand.nextInt(orbs.size()));
@@ -181,8 +204,8 @@ public class EntityXPOrbBig extends EntityXPOrb {
 					orb.setDead();
 				}
 				if(newSize > xpValue) {
+					EntityXPOrbBig norb = new EntityXPOrbBig(worldObj, posX, posY, posZ, newSize);
 					if(!worldObj.isRemote) {
-						EntityXPOrbBig norb = new EntityXPOrbBig(worldObj, posX, posY, posZ, newSize);
 						worldObj.spawnEntityInWorld(norb);
 						setDead();
 					}
@@ -242,6 +265,24 @@ public class EntityXPOrbBig extends EntityXPOrb {
 		this.xpOrbAge = compound.getShort("Age");
 		this.xpValue = compound.getShort("Value");
 	}
+	
+	@Nullable
+	public EntityXPOrbBig getClosestOrb(double posX, double posY, double posZ, double distance) {
+		double d0 = -1.0D;
+		EntityXPOrbBig returnedOrb = null;
+		List<EntityXPOrbBig> orbs = worldObj.getEntitiesWithinAABB(EntityXPOrbBig.class, new AxisAlignedBB(posX - distance, posY - distance, posZ - distance, posX + distance, posY + distance, posZ + distance), input -> !input.getUniqueID().equals(getUniqueID()));
+		for(EntityXPOrbBig orb : orbs) {
+			double d1 = orb.getDistanceSq(posX, posY, posZ);
+			
+			if((distance < 0.0D || d1 < distance * distance) && (d0 == -1.0D || d1 < d0)) {
+				d0 = d1;
+				returnedOrb = orb;
+			}
+		}
+		
+		return returnedOrb;
+	}
+	
 	
 	/**
 	 * Called by a player entity when they collide with an entity

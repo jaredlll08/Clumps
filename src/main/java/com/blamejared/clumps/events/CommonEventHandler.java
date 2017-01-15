@@ -10,7 +10,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class CommonEventHandler {
 	
 	public CommonEventHandler() {
-		System.out.println("subscribing");
 	}
 	
 	@SubscribeEvent
@@ -18,8 +17,9 @@ public class CommonEventHandler {
 		if(e.getEntity() instanceof EntityXPOrb && !(e.getEntity() instanceof EntityXPOrbBig)) {
 			EntityXPOrb orb = (EntityXPOrb) e.getEntity();
 			World world = e.getEntity().worldObj;
+			EntityXPOrbBig bigOrb = new EntityXPOrbBig(world, orb.posX, orb.posY, orb.posZ, orb.xpValue);
 			if(!world.isRemote)
-				world.spawnEntityInWorld(new EntityXPOrbBig(world, orb.posX, orb.posY, orb.posZ, orb.xpValue));
+				world.spawnEntityInWorld(bigOrb);
 			e.setCanceled(true);
 			
 		}
