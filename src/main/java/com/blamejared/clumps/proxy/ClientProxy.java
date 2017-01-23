@@ -11,7 +11,6 @@ public class ClientProxy extends CommonProxy {
 	
 	public void registerEvents() {
 		super.registerEvents();
-		MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
 	}
 	
 	public void registerRenders() {

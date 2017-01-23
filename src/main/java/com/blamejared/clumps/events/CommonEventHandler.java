@@ -4,7 +4,6 @@ import com.blamejared.clumps.entities.EntityXPOrbBig;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class CommonEventHandler {
@@ -21,7 +20,6 @@ public class CommonEventHandler {
 			if(!world.isRemote)
 				world.spawnEntityInWorld(bigOrb);
 			e.setCanceled(true);
-			
 		}
 	}
 	
