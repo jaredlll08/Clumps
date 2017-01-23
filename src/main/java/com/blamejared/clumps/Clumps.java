@@ -34,6 +34,11 @@ public class Clumps extends BaseModFoundation<Clumps> {
 		PROXY.registerRenders();
 		PROXY.registerEvents();
 	}
+
+	@Override
+	public boolean hasConfig() {
+		return false;
+	}
 	
 	@Override
 	public Clumps getInstance() {
