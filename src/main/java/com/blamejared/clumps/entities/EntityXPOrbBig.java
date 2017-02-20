@@ -60,13 +60,14 @@ public class EntityXPOrbBig extends EntityXPOrb {
 	 */
 	public void onUpdate() {
 		super.onUpdate();
+		if(!worldObj.isRemote && this.xpValue == 0) {
+            this.setDead();
+            return;
+        }
 		if(this.delayBeforeCanPickup > 0) {
 			--this.delayBeforeCanPickup;
 		}
-		if(!worldObj.isRemote && this.xpValue == 0) {
-			this.setDead();
-			return;
-		}
+		
 		
 		this.prevPosX = this.posX;
 		this.prevPosY = this.posY;
