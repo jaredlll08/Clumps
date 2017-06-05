@@ -2,10 +2,10 @@ package com.blamejared.clumps.entities;
 
 import com.teamacronymcoders.base.modulesystem.Module;
 import com.teamacronymcoders.base.modulesystem.ModuleBase;
-import com.teamacronymcoders.base.registry.EntityRegistry;
-import com.teamacronymcoders.base.registry.config.ConfigRegistry;
-import com.teamacronymcoders.base.registry.entity.EntityEntry;
-import com.teamacronymcoders.base.registry.entity.UpdateInfo;
+import com.teamacronymcoders.base.registrysystem.EntityRegistry;
+import com.teamacronymcoders.base.registrysystem.config.ConfigRegistry;
+import com.teamacronymcoders.base.registrysystem.entity.EntityEntry;
+import com.teamacronymcoders.base.registrysystem.entity.UpdateInfo;
 import net.minecraft.util.ResourceLocation;
 
 import static com.blamejared.clumps.reference.Reference.MODID;

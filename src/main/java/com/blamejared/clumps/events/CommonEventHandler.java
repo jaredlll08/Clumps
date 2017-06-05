@@ -15,10 +15,10 @@ public class CommonEventHandler {
 	public void updateEntities(EntityJoinWorldEvent e) {
 		if(e.getEntity() instanceof EntityXPOrb && !(e.getEntity() instanceof EntityXPOrbBig)) {
 			EntityXPOrb orb = (EntityXPOrb) e.getEntity();
-			World world = e.getEntity().worldObj;
+			World world = e.getEntity().world;
 			EntityXPOrbBig bigOrb = new EntityXPOrbBig(world, orb.posX, orb.posY, orb.posZ, orb.xpValue);
 			if(!world.isRemote)
-				world.spawnEntityInWorld(bigOrb);
+				world.spawnEntity(bigOrb);
 			e.setCanceled(true);
 		}
 	}

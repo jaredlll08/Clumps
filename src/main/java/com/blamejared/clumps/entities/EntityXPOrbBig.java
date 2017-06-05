@@ -2,6 +2,7 @@ package com.blamejared.clumps.entities;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
@@ -60,7 +61,7 @@ public class EntityXPOrbBig extends EntityXPOrb {
 	 */
 	public void onUpdate() {
 		super.onUpdate();
-		if(!worldObj.isRemote && this.xpValue == 0) {
+		if(!world.isRemote && this.xpValue == 0) {
             this.setDead();
             return;
         }
@@ -77,7 +78,7 @@ public class EntityXPOrbBig extends EntityXPOrb {
 			this.motionY -= 0.029999999329447746D;
 		}
 		
-		if(this.worldObj.getBlockState(new BlockPos(this)).getMaterial() == Material.LAVA) {
+		if(this.world.getBlockState(new BlockPos(this)).getMaterial() == Material.LAVA) {
 			this.motionY = 0.20000000298023224D;
 			this.motionX = (double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
 			this.motionZ = (double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
@@ -89,7 +90,7 @@ public class EntityXPOrbBig extends EntityXPOrb {
 		
 		if(this.xpTargetColor < this.xpColor - 20 + this.getEntityId() % 100) {
 			if(this.closestPlayer == null || this.closestPlayer.getDistanceSqToEntity(this) > 64.0D) {
-				this.closestPlayer = this.worldObj.getClosestPlayerToEntity(this, 8.0D);
+				this.closestPlayer = this.world.getClosestPlayerToEntity(this, 8.0D);
 			}
 			
 			this.xpTargetColor = this.xpColor;
@@ -114,11 +115,11 @@ public class EntityXPOrbBig extends EntityXPOrb {
 			}
 		}
 		
-		this.moveEntity(this.motionX, this.motionY, this.motionZ);
+		this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
 		float f = 0.98F;
 		
 		if(this.onGround) {
-			f = this.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.getEntityBoundingBox().minY) - 1, MathHelper.floor_double(this.posZ))).getBlock().slipperiness * 0.98F;
+			f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.98F;
 		}
 		
 		this.motionX *= (double) f;
@@ -134,19 +135,19 @@ public class EntityXPOrbBig extends EntityXPOrb {
 		if(this.xpOrbAge >= 6000) {
 			this.setDead();
 		}
-		if(worldObj.getTotalWorldTime()%5 ==0) {
-			List<EntityXPOrbBig> orbs = worldObj.getEntitiesWithinAABB(EntityXPOrbBig.class, new AxisAlignedBB(posX - 2, posY - 2, posZ - 2, posX + 2, posY + 2, posZ + 2));
+		if(world.getTotalWorldTime()%5 ==0) {
+			List<EntityXPOrbBig> orbs = world.getEntitiesWithinAABB(EntityXPOrbBig.class, new AxisAlignedBB(posX - 2, posY - 2, posZ - 2, posX + 2, posY + 2, posZ + 2));
 			int newSize = 0;
 			if(orbs.size() > 0) {
-				EntityXPOrbBig orb = orbs.get(worldObj.rand.nextInt(orbs.size()));
+				EntityXPOrbBig orb = orbs.get(world.rand.nextInt(orbs.size()));
 				if(!orb.getUniqueID().equals(this.getUniqueID()) && orb.xpValue < this.xpValue) {
 					newSize += orb.getXpValue() + xpValue;
 					orb.setDead();
 				}
 				if(newSize > xpValue) {
-					if(!worldObj.isRemote) {
-						EntityXPOrbBig norb = new EntityXPOrbBig(worldObj, posX, posY, posZ, newSize);
-						worldObj.spawnEntityInWorld(norb);
+					if(!world.isRemote) {
+						EntityXPOrbBig norb = new EntityXPOrbBig(world, posX, posY, posZ, newSize);
+						world.spawnEntity(norb);
 						setDead();
 					}
 				}
@@ -161,11 +162,11 @@ public class EntityXPOrbBig extends EntityXPOrb {
 	 * Called by a player entity when they collide with an entity
 	 */
 	public void onCollideWithPlayer(EntityPlayer entityIn) {
-		if(!this.worldObj.isRemote) {
+		if(!this.world.isRemote) {
 			if(net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerPickupXpEvent(entityIn, this)))
 				return;
 			entityIn.xpCooldown = 0;
-			this.worldObj.playSound(null, entityIn.posX, entityIn.posY, entityIn.posZ, SoundEvents.ENTITY_EXPERIENCE_ORB_TOUCH, SoundCategory.PLAYERS, 0.1F, 0.5F * ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.8F));
+			this.world.playSound(null, entityIn.posX, entityIn.posY, entityIn.posZ, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.8F));
 			entityIn.onItemPickup(this, 1);
 			ItemStack itemstack = EnchantmentHelper.getEnchantedItem(Enchantments.MENDING, entityIn);
 			
