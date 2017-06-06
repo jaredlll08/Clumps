@@ -4,13 +4,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.*;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.datasync.*;
-import net.minecraft.util.*;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
@@ -86,7 +83,6 @@ public class EntityXPOrbBig extends EntityXPOrb {
 		}
 		
 		this.pushOutOfBlocks(this.posX, (this.getEntityBoundingBox().minY + this.getEntityBoundingBox().maxY) / 2.0D, this.posZ);
-		double d0 = 8.0D;
 		
 		if(this.xpTargetColor < this.xpColor - 20 + this.getEntityId() % 100) {
 			if(this.closestPlayer == null || this.closestPlayer.getDistanceSqToEntity(this) > 64.0D) {
@@ -170,7 +166,7 @@ public class EntityXPOrbBig extends EntityXPOrb {
 			entityIn.onItemPickup(this, 1);
 			ItemStack itemstack = EnchantmentHelper.getEnchantedItem(Enchantments.MENDING, entityIn);
 			
-			if(itemstack != null && itemstack.isItemDamaged()) {
+			if(!itemstack.isEmpty() && itemstack.isItemDamaged()) {
 				int i = Math.min(this.xpToDurability(this.xpValue), itemstack.getItemDamage());
 				this.xpValue -= this.durabilityToXp(i);
 				itemstack.setItemDamage(itemstack.getItemDamage() - i);

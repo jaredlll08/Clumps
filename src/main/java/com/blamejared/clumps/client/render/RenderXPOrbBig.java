@@ -1,16 +1,11 @@
 package com.blamejared.clumps.client.render;
 
 import com.blamejared.clumps.entities.EntityXPOrbBig;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.*;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.relauncher.*;
 
 @SideOnly(Side.CLIENT)
@@ -34,27 +29,21 @@ public class RenderXPOrbBig extends Render<EntityXPOrbBig> {
 			this.bindEntityTexture(entity);
 			RenderHelper.enableStandardItemLighting();
 			int i = entity.getTextureByXP();
-			float f = (float) (i % 4 * 16 + 0) / 64.0F;
+			float f = (float) (i % 4 * 16) / 64.0F;
 			float f1 = (float) (i % 4 * 16 + 16) / 64.0F;
-			float f2 = (float) (i / 4 * 16 + 0) / 64.0F;
+			float f2 = (float) (i / 4 * 16) / 64.0F;
 			float f3 = (float) (i / 4 * 16 + 16) / 64.0F;
-			float f4 = 1.0F;
-			float f5 = 0.5F;
-			float f6 = 0.25F;
 			int j = entity.getBrightnessForRender(partialTicks);
 			int k = j % 65536;
 			int l = j / 65536;
 			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) k, (float) l);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			float f8 = 255.0F;
 			float f9 = ((float) entity.xpColor) / 2.0F;
 			l = (int) ((MathHelper.sin(f9 + 1) + 1.0F)  * 255);
-			int i1 = 255;
 			int j1 = 0xFFFFFF;//(int) ((MathHelper.sin(f9 + 4.1887903F) + 1.0F) * 255.0F);
 			GlStateManager.translate(0.0F, 0.1F, 0.0F);
 			GlStateManager.rotate(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
 			GlStateManager.rotate((float) (this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-			float f7 = 0.3F;
 			GlStateManager.scale(0.3F, 0.3F, 0.3F);
 			Tessellator tessellator = Tessellator.getInstance();
 			VertexBuffer vertexbuffer = tessellator.getBuffer();

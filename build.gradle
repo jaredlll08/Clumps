@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 
 
-version = "1.0.5"
+version = "2.0.0"
 group = "com.blamejared.clumps"
 archivesBaseName = "Clumps"
 
@@ -35,8 +35,7 @@ repositories {
     }
 }
 dependencies {
-    compile fileTree(dir: "lib", include: ["*.jar"])
-    //compile "com.teamacronymcoders.base:base:1.10.2-1.2.1-Snapshot.101:deobf"
+    deobfCompile "com.teamacronymcoders.base:base:1.11.2-2.0.0-Snapshot.+"
 }
 
 processResources
