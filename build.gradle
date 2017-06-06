@@ -21,9 +21,9 @@ compileJava {
 }
 
 minecraft {
-    version = "1.10.2-12.18.3.2202"
+    version = "1.11.2-13.20.0.2312"
     runDir = "run"
-    mappings = "snapshot_20161111"
+    mappings = "snapshot_20161220"
 }
 
 repositories {
@@ -35,7 +35,8 @@ repositories {
     }
 }
 dependencies {
-    compile "com.teamacronymcoders.base:base:1.10.2-1.2.1-Snapshot.101:deobf"
+    compile fileTree(dir: "lib", include: ["*.jar"])
+    //compile "com.teamacronymcoders.base:base:1.10.2-1.2.1-Snapshot.101:deobf"
 }
 
 processResources
