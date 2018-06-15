@@ -85,7 +85,7 @@ public class EntityXPOrbBig extends EntityXPOrb {
 		this.pushOutOfBlocks(this.posX, (this.getEntityBoundingBox().minY + this.getEntityBoundingBox().maxY) / 2.0D, this.posZ);
 		
 		if(this.xpTargetColor < this.xpColor - 20 + this.getEntityId() % 100) {
-			if(this.closestPlayer == null || this.closestPlayer.getDistanceSqToEntity(this) > 64.0D) {
+			if(this.closestPlayer == null || this.closestPlayer.getDistance(this) > 64.0D) {
 				this.closestPlayer = this.world.getClosestPlayerToEntity(this, 8.0D);
 			}
 			
@@ -125,8 +125,8 @@ public class EntityXPOrbBig extends EntityXPOrb {
 		if(this.onGround) {
 			this.motionY *= -0.8999999761581421D;
 		}
-		++this.xpColor;
-		++this.xpOrbAge;
+//		++this.xpColor;
+//		++this.xpOrbAge;
 		
 		if(this.xpOrbAge >= 6000) {
 			this.setDead();
@@ -187,4 +187,6 @@ public class EntityXPOrbBig extends EntityXPOrb {
 	private int xpToDurability(int xp) {
 		return xp * 2;
 	}
+	
+
 }

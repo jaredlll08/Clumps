@@ -13,13 +13,14 @@ public class CommonEventHandler {
 	
 	@SubscribeEvent
 	public void updateEntities(EntityJoinWorldEvent e) {
-		if(e.getEntity() instanceof EntityXPOrb && !(e.getEntity() instanceof EntityXPOrbBig)) {
-			EntityXPOrb orb = (EntityXPOrb) e.getEntity();
+        if(e.getEntity() instanceof EntityXPOrb && !(e.getEntity() instanceof EntityXPOrbBig)) {
+            EntityXPOrb orb = (EntityXPOrb) e.getEntity();
 			World world = e.getEntity().world;
 			EntityXPOrbBig bigOrb = new EntityXPOrbBig(world, orb.posX, orb.posY, orb.posZ, orb.xpValue);
-			if(!world.isRemote)
-				world.spawnEntity(bigOrb);
-			e.setCanceled(true);
+			if(!world.isRemote) {
+                world.spawnEntity(bigOrb);
+                e.setCanceled(true);
+            }
 		}
 	}
 	
