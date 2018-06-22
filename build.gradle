@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 
 
-version = "3.0.0"
+version = "3.1.0"
 group = "com.blamejared.clumps"
 archivesBaseName = "Clumps"
 
@@ -29,13 +29,8 @@ minecraft {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        name 'Jared'
-        url 'http://blamejared.com/maven'
-    }
 }
 dependencies {
-    deobfCompile "com.teamacronymcoders.base:base:1.12.2-3.7.0-SNAPSHOT.+"
 }
 
 processResources
