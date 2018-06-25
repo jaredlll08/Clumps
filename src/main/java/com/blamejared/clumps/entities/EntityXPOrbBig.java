@@ -136,7 +136,7 @@ public class EntityXPOrbBig extends EntityXPOrb {
 			int newSize = 0;
 			if(orbs.size() > 0) {
 				EntityXPOrbBig orb = orbs.get(world.rand.nextInt(orbs.size()));
-				if(!orb.getUniqueID().equals(this.getUniqueID()) && orb.xpValue < this.xpValue) {
+				if(!orb.getUniqueID().equals(this.getUniqueID()) && orb.xpValue <= this.xpValue) {
 					newSize += orb.getXpValue() + xpValue;
 					orb.setDead();
 				}
