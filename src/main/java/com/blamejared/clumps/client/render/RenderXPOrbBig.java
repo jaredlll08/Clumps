@@ -50,7 +50,7 @@ public class RenderXPOrbBig extends Render<EntityXPOrbBig> {
             int j1 = 0xFFFFFF;//(int) ((MathHelper.sin(f9 + 4.1887903F) + 1.0F) * 255.0F);
             GlStateManager.translate(0.0F, 0.1F, 0.0F);
             GlStateManager.rotate(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate((float) (this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate((float) (this.renderManager.options != null && this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
             GlStateManager.scale(0.3F, 0.3F, 0.3F);
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder vertexbuffer = tessellator.getBuffer();
@@ -63,7 +63,7 @@ public class RenderXPOrbBig extends Render<EntityXPOrbBig> {
             GlStateManager.disableBlend();
             GlStateManager.disableRescaleNormal();
             GlStateManager.popMatrix();
-//            super.doRender(entity, x, y, z, entityYaw, partialTicks);
+            //            super.doRender(entity, x, y, z, entityYaw, partialTicks);
         }
     }
     
@@ -78,7 +78,7 @@ public class RenderXPOrbBig extends Render<EntityXPOrbBig> {
     public static class Factory implements IRenderFactory<EntityXPOrbBig> {
         
         @Override
-        public Render<? super EntityXPOrbBig> createRenderFor (RenderManager manager) {
+        public Render<? super EntityXPOrbBig> createRenderFor(RenderManager manager) {
             
             return new RenderXPOrbBig(manager);
         }
