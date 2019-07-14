@@ -1,27 +1,22 @@
 package com.blamejared.clumps.events;
 
-import com.blamejared.clumps.entities.EntityXPOrbBig;
-import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.world.World;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import com.blamejared.clumps.reference.Reference;
+import net.minecraft.entity.EntityType;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+
+import static com.blamejared.clumps.Clumps.BIG_ORB_ENTITY_TYPE;
+
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CommonEventHandler {
-	
-	public CommonEventHandler() {
-	}
-	
-	@SubscribeEvent
-	public void updateEntities(EntityJoinWorldEvent e) {
-        if(e.getEntity() instanceof EntityXPOrb && !(e.getEntity() instanceof EntityXPOrbBig)) {
-            EntityXPOrb orb = (EntityXPOrb) e.getEntity();
-			World world = e.getEntity().world;
-			EntityXPOrbBig bigOrb = new EntityXPOrbBig(world, orb.posX, orb.posY, orb.posZ, orb.xpValue);
-			if(!world.isRemote) {
-                world.spawnEntity(bigOrb);
-                e.setCanceled(true);
-            }
-		}
-	}
-	
+    
+    public CommonEventHandler() {
+    }
+    
+    @SubscribeEvent
+    public static void registerEntity(RegistryEvent.Register<EntityType<?>> register) {
+        register.getRegistry().register(BIG_ORB_ENTITY_TYPE.setRegistryName(Reference.MODID, "xp_orb_big"));
+    }
 }

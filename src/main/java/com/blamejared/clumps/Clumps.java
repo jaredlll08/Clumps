@@ -1,43 +1,53 @@
 package com.blamejared.clumps;
 
+import com.blamejared.clumps.client.render.RenderXPOrbBig;
 import com.blamejared.clumps.entities.EntityXPOrbBig;
-import com.blamejared.clumps.proxy.CommonProxy;
+import com.blamejared.clumps.events.CommonEventHandler;
 import com.blamejared.clumps.reference.Reference;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.*;
+import net.minecraft.entity.item.ExperienceOrbEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.*;
-import net.minecraftforge.fml.common.event.*;
-import net.minecraftforge.fml.common.registry.*;
+import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod(modid = Reference.MODID, name = Reference.NAME, version = Reference.VERSION, dependencies = Reference.DEPENDECIES)
+@Mod(Reference.MODID)
 public class Clumps {
     
+    public static final EntityType<EntityXPOrbBig> BIG_ORB_ENTITY_TYPE = EntityType.Builder.<EntityXPOrbBig> create(EntityClassification.MISC).size(0.5f, 0.5f).build(Reference.MODID + ":xp_orb_big");
     
-    @Mod.Instance(Reference.MODID)
-    public static Clumps INSTANCE;
     
-    @SidedProxy(clientSide = "com.blamejared.clumps.proxy.ClientProxy", serverSide = "com.blamejared.clumps.proxy.CommonProxy")
-    public static CommonProxy PROXY;
-    
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(this);
-        //        RenderingRegistry.registerEntityRenderingHandler(EntityXPOrbBig.class, new RenderXPOrbBig.Factory());//registerEntityRenderingHandler(EntityXPOrbBig.class, new RenderXPOrbBig(Minecraft.getMinecraft().getRenderManager()));
-        EntityRegistry.registerModEntity(new ResourceLocation(Reference.MODID, "xp_orb_big"), EntityXPOrbBig.class, "xp_orb_big", 0, INSTANCE, 32,10,true);
-        PROXY.registerEvents();
-        PROXY.registerRenders();
+    public Clumps() {
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
     }
     
-//    @SubscribeEvent
-//    public void onRegistryRegister(RegistryEvent.Register<EntityEntry> event) {
-//        EntityEntry value = new EntityEntry(EntityXPOrbBig.class, "xp_orb_big");
-//        value.setRegistryName(Reference.MODID, "xp_orb_big");
-//        event.getRegistry().register(value);
-//    }
+    private void setup(final FMLCommonSetupEvent event) {
+        MinecraftForge.EVENT_BUS.register(this);
+    }
     
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
+    private void doClientStuff(final FMLClientSetupEvent event) {
+        RenderingRegistry.registerEntityRenderingHandler(EntityXPOrbBig.class, new RenderXPOrbBig.Factory());
+    }
     
+    @SubscribeEvent
+    public void joinWorld(EntityJoinWorldEvent e) {
+        if(e.getEntity() instanceof ExperienceOrbEntity && !(e.getEntity() instanceof EntityXPOrbBig)) {
+            World world = e.getEntity().world;
+            if(!world.isRemote) {
+                ExperienceOrbEntity orb = (ExperienceOrbEntity) e.getEntity();
+                EntityXPOrbBig bigOrb = new EntityXPOrbBig(world, orb.posX, orb.posY, orb.posZ, orb.xpValue);
+                world.addEntity(bigOrb);
+                e.setCanceled(true);
+            }
+        }
     }
     
     
