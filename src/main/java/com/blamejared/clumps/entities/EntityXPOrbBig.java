@@ -1,18 +1,25 @@
 package com.blamejared.clumps.entities;
 
+import java.util.List;
+import java.util.Map;
+
 import com.blamejared.clumps.Clumps;
-import net.minecraft.enchantment.*;
-import net.minecraft.entity.*;
+
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.*;
-import net.minecraft.util.math.*;
+import net.minecraft.util.EntityPredicates;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
-import java.util.*;
 
 public class EntityXPOrbBig extends ExperienceOrbEntity {
     

@@ -1,13 +1,14 @@
 package com.blamejared.clumps.events;
 
 
+import static com.blamejared.clumps.Clumps.BIG_ORB_ENTITY_TYPE;
+
 import com.blamejared.clumps.reference.Reference;
+
 import net.minecraft.entity.EntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import static com.blamejared.clumps.Clumps.BIG_ORB_ENTITY_TYPE;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CommonEventHandler {
