@@ -22,3 +22,4 @@
 /run/
 usernamecache.json
 *.stackdump
+*.launch
