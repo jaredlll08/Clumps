@@ -20,8 +20,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod(Reference.MODID)
 public class Clumps {
     
-    public static final EntityType<EntityXPOrbBig> BIG_ORB_ENTITY_TYPE = EntityType.Builder.<EntityXPOrbBig> create(EntityClassification.MISC).size(0.5f, 0.5f).build(Reference.MODID + ":xp_orb_big");
+    public static final EntityType<EntityXPOrbBig> BIG_ORB_ENTITY_TYPE = EntityType.Builder.<EntityXPOrbBig> create(EntityClassification.MISC).size(0.5f, 0.5f).setCustomClientFactory((pkt, world) -> new EntityXPOrbBig(world)).build(Reference.MODID + ":xp_orb_big");
     
+    //.setCustomClientFactory((pkt, world) -> new EntitySubscribeButton(world))
     
     public Clumps() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
@@ -48,6 +49,4 @@ public class Clumps {
             }
         }
     }
-    
-    
 }

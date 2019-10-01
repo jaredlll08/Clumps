@@ -13,6 +13,8 @@ import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.SoundEvents;
@@ -20,8 +22,10 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fml.network.NetworkHooks;
 
-public class EntityXPOrbBig extends ExperienceOrbEntity {
+public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditionalSpawnData {
     
     /**
      * The closest EntityPlayer to this orb.
@@ -40,13 +44,16 @@ public class EntityXPOrbBig extends ExperienceOrbEntity {
         this.xpValue = expValue;
     }
     
-    public EntityXPOrbBig(EntityType<? extends ExperienceOrbEntity> p_i50382_1_, World p_i50382_2_) {
-        super(Clumps.BIG_ORB_ENTITY_TYPE, p_i50382_2_);
+    public EntityXPOrbBig(EntityType<? extends ExperienceOrbEntity> type, World world) {
+        super(Clumps.BIG_ORB_ENTITY_TYPE, world);
+    }
+    
+    public EntityXPOrbBig(World world) {
+        super(Clumps.BIG_ORB_ENTITY_TYPE, world);
     }
     
     @Override
     public void tick() {
-        //        super.tick();
         if(!world.isRemote && this.xpValue == 0) {
             this.remove();
             return;
@@ -171,10 +178,19 @@ public class EntityXPOrbBig extends ExperienceOrbEntity {
     private int durabilityToXp(int durability) {
         return durability / 2;
     }
-    
-    private int xpToDurability(int xp) {
-        return xp * 2;
+
+    @Override
+    public IPacket<?> createSpawnPacket () {        
+        return NetworkHooks.getEntitySpawningPacket(this);
     }
-    
-    
+
+	@Override
+	public void writeSpawnData(PacketBuffer buffer) {
+		buffer.writeInt(this.xpValue);
+	}
+
+	@Override
+	public void readSpawnData(PacketBuffer additionalData) {
+		this.xpValue = additionalData.readInt();
+	}
 }
