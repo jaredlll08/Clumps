@@ -1,5 +1,5 @@
 modLoader="javafml" #mandatory
-loaderVersion="[26,)" #mandatory (26 is current forge version)
+loaderVersion="[28,)" #mandatory (26 is current forge version)
 issueTrackerURL="http://my.issue.tracker/" #optional
 [[mods]] #mandatory
 modId="clumps" #mandatory
@@ -14,12 +14,12 @@ Clumps xp orbs together.
 [[dependencies.examplemod]] #optional
     modId="forge" #mandatory
     mandatory=true #mandatory
-    versionRange="[27,)" #mandatory
+    versionRange="[28,)" #mandatory
     ordering="NONE"
     side="BOTH"
 [[dependencies.examplemod]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.14.3]"
+    versionRange="[1.14.4]"
     ordering="NONE"
     side="BOTH"
