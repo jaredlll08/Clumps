@@ -1,23 +1,25 @@
-modLoader="javafml" #mandatory
-loaderVersion="[28,)" #mandatory (26 is current forge version)
-issueTrackerURL="http://my.issue.tracker/" #optional
+modLoader="javafml"
+loaderVersion="[28,)"
+issueTrackerURL="https://github.com/jaredlll08/Clumps/issues"
+
 [[mods]] #mandatory
-modId="clumps" #mandatory
-version="${file.jarVersion}" #mandatory
-displayName="Clumps" #mandatory
-displayURL="http://example.com/" #optional
-credits="" #optional
-authors="Jaredlll08" #optional
+modId="clumps"
+version="${file.jarVersion}"
+displayName="Clumps"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/clumps"
+credits=""
+authors="Jaredlll08"
 description='''
 Clumps xp orbs together.
 '''
-[[dependencies.examplemod]] #optional
-    modId="forge" #mandatory
-    mandatory=true #mandatory
-    versionRange="[28,)" #mandatory
+
+[[dependencies.clumps]]
+    modId="forge"
+    mandatory=true
+    versionRange="[28,)"
     ordering="NONE"
     side="BOTH"
-[[dependencies.examplemod]]
+[[dependencies.clumps]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.14.4]"
