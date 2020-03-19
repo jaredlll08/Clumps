@@ -2,14 +2,11 @@ package com.blamejared.clumps.client.render;
 
 import com.blamejared.clumps.entities.EntityXPOrbBig;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.*;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.culling.ClippingHelperImpl;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
@@ -43,12 +40,12 @@ public class RenderXPOrbBig extends EntityRenderer<EntityXPOrbBig> {
         float maxX = (float) (texIndex % 4 * 16 + 16) / 64.0F;
         float minY = (float) (texIndex / 4 * 16) / 64.0F;
         float maxY = (float) (texIndex / 4 * 16 + 16) / 64.0F;
-    
+        
         int red;
         int green;
         int blue;
         float f9 = ((float) entity.xpColor + partialTicks) / 2.0F;
-        red = (int)((MathHelper.sin(f9 + 0.0F) + 1.0F) * 0.5F * 255.0F);
+        red = (int) ((MathHelper.sin(f9 + 0.0F) + 1.0F) * 0.5F * 255.0F);
         green = 255;
         blue = 0xFFFFFF;
         // More custom colours, requires red, green and blue to be floats to work
@@ -71,12 +68,12 @@ public class RenderXPOrbBig extends EntityRenderer<EntityXPOrbBig> {
         matrix.rotate(this.renderManager.getCameraOrientation());
         matrix.rotate(Vector3f.YP.rotationDegrees(180.0F));
         matrix.scale(0.3F, 0.3F, 0.3F);
-    
-        IVertexBuilder ivertexbuilder = buffer.getBuffer(RenderType.getEntityTranslucent(EXPERIENCE_ORB_TEXTURES));
+        
+        IVertexBuilder ivertexbuilder = buffer.getBuffer(RENDER_TYPE);
         MatrixStack.Entry matrixstack$entry = matrix.getLast();
         Matrix4f matrix4f = matrixstack$entry.getMatrix();
         Matrix3f matrix3f = matrixstack$entry.getNormal();
-    
+        
         vertex(ivertexbuilder, matrix4f, matrix3f, -1, -1F, red, green, blue, minX, maxY, packedLightIn);
         vertex(ivertexbuilder, matrix4f, matrix3f, +1, -1F, red, green, blue, maxX, maxY, packedLightIn);
         vertex(ivertexbuilder, matrix4f, matrix3f, +1, +1F, red, green, blue, maxX, minY, packedLightIn);
