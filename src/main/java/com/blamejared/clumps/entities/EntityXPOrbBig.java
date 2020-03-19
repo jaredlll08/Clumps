@@ -61,8 +61,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
         if(this.delayBeforeCanPickup > 0) {
             --this.delayBeforeCanPickup;
         }
-        
-        
+    
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
@@ -115,7 +114,8 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
         if(this.onGround) {
             this.setMotion(this.getMotion().mul(1.0D, -0.9D, 1.0D));
         }
-        
+        ++this.xpColor;
+        ++this.xpOrbAge;
         if(this.xpOrbAge >= 6000) {
             this.remove();
         }
