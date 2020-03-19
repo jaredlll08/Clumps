@@ -1,29 +1,22 @@
 package com.blamejared.clumps.entities;
 
-import java.util.List;
-import java.util.Map;
-
 import com.blamejared.clumps.Clumps;
-
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MoverType;
+import net.minecraft.enchantment.*;
+import net.minecraft.entity.*;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.*;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.EntityPredicates;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
+
+import java.util.*;
 
 public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditionalSpawnData {
     
@@ -61,10 +54,10 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
         if(this.delayBeforeCanPickup > 0) {
             --this.delayBeforeCanPickup;
         }
-    
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
+        
+        this.prevPosX = this.getPosX();
+        this.prevPosY = this.getPosY();
+        this.prevPosZ = this.getPosZ();
         
         if(this.areEyesInFluid(FluidTags.WATER)) {
             this.applyFloatMotion();
@@ -77,8 +70,8 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
             this.playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.4F, 2.0F + this.rand.nextFloat() * 0.4F);
         }
         
-        if(!this.world.areCollisionShapesEmpty(this.getBoundingBox())) {
-            this.pushOutOfBlocks(this.posX, (this.getBoundingBox().minY + this.getBoundingBox().maxY) / 2.0D, this.posZ);
+        if(!this.world.func_226664_a_(this.getBoundingBox())) {
+            this.pushOutOfBlocks(this.getPosX(), (this.getBoundingBox().minY + this.getBoundingBox().maxY) / 2.0D, this.getPosZ());
         }
         
         if(this.xpTargetColor < this.xpColor - 20 + this.getEntityId() % 100) {
@@ -94,7 +87,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
         }
         
         if(this.closestPlayer != null) {
-            Vec3d vec3d = new Vec3d(this.closestPlayer.posX - this.posX, this.closestPlayer.posY + (double) this.closestPlayer.getEyeHeight() / 2.0D - this.posY, this.closestPlayer.posZ - this.posZ);
+            Vec3d vec3d = new Vec3d(this.closestPlayer.getPosX() - this.getPosX(), this.closestPlayer.getPosY() + (double) this.closestPlayer.getEyeHeight() / 2.0D - this.getPosY(), this.closestPlayer.getPosZ() - this.getPosZ());
             double d1 = vec3d.lengthSquared();
             if(d1 < 64.0D) {
                 double d2 = 1.0D - Math.sqrt(d1) / 8.0D;
@@ -106,7 +99,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
         float f = 0.98F;
         
         if(this.onGround) {
-            BlockPos underPos = new BlockPos(this.posX, this.getBoundingBox().minY - 1.0D, this.posZ);
+            BlockPos underPos = new BlockPos(this.getPosX(), this.getBoundingBox().minY - 1.0D, this.getPosZ());
             f = this.world.getBlockState(underPos).getSlipperiness(this.world, underPos, this) * 0.98F;
         }
         
@@ -120,7 +113,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
             this.remove();
         }
         if(world.getGameTime() % 5 == 0) {
-            List<EntityXPOrbBig> orbs = world.getEntitiesWithinAABB(EntityXPOrbBig.class, new AxisAlignedBB(posX - 2, posY - 2, posZ - 2, posX + 2, posY + 2, posZ + 2), EntityPredicates.IS_ALIVE);
+            List<EntityXPOrbBig> orbs = world.getEntitiesWithinAABB(EntityXPOrbBig.class, new AxisAlignedBB(getPosX() - 2, getPosY() - 2, getPosZ() - 2, getPosX() + 2, getPosY() + 2, getPosZ() + 2), EntityPredicates.IS_ALIVE);
             int newSize = 0;
             if(orbs.size() > 0) {
                 EntityXPOrbBig orb = orbs.get(world.rand.nextInt(orbs.size()));
@@ -130,7 +123,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
                 }
                 if(newSize > xpValue) {
                     if(!world.isRemote) {
-                        EntityXPOrbBig norb = new EntityXPOrbBig(world, posX, posY, posZ, newSize);
+                        EntityXPOrbBig norb = new EntityXPOrbBig(world, getPosX(), getPosY(), getPosZ(), newSize);
                         world.addEntity(norb);
                         remove();
                     }
@@ -151,11 +144,11 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
     public void onCollideWithPlayer(PlayerEntity entityIn) {
         if(!this.world.isRemote) {
             if(this.delayBeforeCanPickup == 0 && entityIn.xpCooldown == 0) {
-                if(net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerPickupXpEvent(entityIn, this)))
+                if(net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PlayerXpEvent.PickupXp(entityIn, this)))
                     return;
                 entityIn.xpCooldown = 2;
                 entityIn.onItemPickup(this, 1);
-                Map.Entry<EquipmentSlotType, ItemStack> entry = EnchantmentHelper.func_222189_b(Enchantments.MENDING, entityIn);
+                Map.Entry<EquipmentSlotType, ItemStack> entry = EnchantmentHelper.getRandomItemWithEnchantment(Enchantments.MENDING, entityIn);
                 if(entry != null) {
                     ItemStack itemstack = entry.getValue();
                     if(!itemstack.isEmpty() && itemstack.isDamaged()) {
@@ -178,19 +171,19 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
     private int durabilityToXp(int durability) {
         return durability / 2;
     }
-
+    
     @Override
-    public IPacket<?> createSpawnPacket () {        
+    public IPacket<?> createSpawnPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
-
-	@Override
-	public void writeSpawnData(PacketBuffer buffer) {
-		buffer.writeInt(this.xpValue);
-	}
-
-	@Override
-	public void readSpawnData(PacketBuffer additionalData) {
-		this.xpValue = additionalData.readInt();
-	}
+    
+    @Override
+    public void writeSpawnData(PacketBuffer buffer) {
+        buffer.writeInt(this.xpValue);
+    }
+    
+    @Override
+    public void readSpawnData(PacketBuffer additionalData) {
+        this.xpValue = additionalData.readInt();
+    }
 }

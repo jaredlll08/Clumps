@@ -37,7 +37,7 @@ public class Clumps {
             World world = e.getEntity().world;
             if(!world.isRemote) {
                 ExperienceOrbEntity orb = (ExperienceOrbEntity) e.getEntity();
-                EntityXPOrbBig bigOrb = new EntityXPOrbBig(world, orb.posX, orb.posY, orb.posZ, orb.xpValue);
+                EntityXPOrbBig bigOrb = new EntityXPOrbBig(world, orb.getPosX(), orb.getPosY(), orb.getPosZ(), orb.xpValue);
                 world.addEntity(bigOrb);
                 e.setCanceled(true);
             }

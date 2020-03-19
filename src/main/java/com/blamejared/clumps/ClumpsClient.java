@@ -9,6 +9,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class ClumpsClient {
 
     protected static void setupClient(FMLClientSetupEvent event) {
-        RenderingRegistry.registerEntityRenderingHandler(EntityXPOrbBig.class, RenderXPOrbBig::new);
+        RenderingRegistry.registerEntityRenderingHandler(Clumps.BIG_ORB_ENTITY_TYPE, RenderXPOrbBig::new);
     }
 }

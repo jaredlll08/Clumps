@@ -12,14 +12,14 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '4.0.1'
+version = '5.0.0'
 group = 'com.blamejared.clumps' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'Clumps'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20191001-1.14.3'
+    mappings channel: 'snapshot', version: '20200225-1.15.1'
     runs {
         client {
             workingDirectory project.file('run')
@@ -74,7 +74,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.26'
+    minecraft 'net.minecraftforge:forge:1.15.2-31.1.25'
 
 }
 
