@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 public class RenderXPOrbBig extends EntityRenderer<EntityXPOrbBig> {
     
     private static final ResourceLocation EXPERIENCE_ORB_TEXTURES = new ResourceLocation("textures/entity/experience_orb.png");
-    private static final RenderType RENDER_TYPE = RenderType.getEntitySolid(EXPERIENCE_ORB_TEXTURES);
+    private static final RenderType RENDER_TYPE = RenderType.getEntityTranslucent(EXPERIENCE_ORB_TEXTURES);
     
     public RenderXPOrbBig(EntityRendererManager renderManagerIn) {
         super(renderManagerIn);
