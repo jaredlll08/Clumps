@@ -1,14 +1,18 @@
 package com.blamejared.clumps.client.render;
 
 import com.blamejared.clumps.entities.EntityXPOrbBig;
-import com.mojang.blaze3d.platform.*;
-import net.minecraft.client.renderer.*;
+import com.mojang.blaze3d.platform.GLX;
+import com.mojang.blaze3d.platform.GlStateManager;
+
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.*;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
 
 public class RenderXPOrbBig extends EntityRenderer<EntityXPOrbBig> {
     
@@ -25,9 +29,7 @@ public class RenderXPOrbBig extends EntityRenderer<EntityXPOrbBig> {
         return true;
     }
     
-    /**
-     * Renders the desired {@code T} type Entity.
-     */
+    @Override
     public void doRender(EntityXPOrbBig entity, double x, double y, double z, float entityYaw, float partialTicks) {
         if(!this.renderOutlines) {
             GlStateManager.pushMatrix();
@@ -44,41 +46,41 @@ public class RenderXPOrbBig extends EntityRenderer<EntityXPOrbBig> {
             int l = j / 65536;
             GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, (float) k, (float) l);
             GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            float f9 = ((float) entity.xpColor) / 2.0F;
-            l = (int) ((MathHelper.sin(f9 + 1) + 1.0F) * 255);
-            int j1 = 0xFFFFFF;//(int) ((MathHelper.sin(f9 + 4.1887903F) + 1.0F) * 255.0F);
             GlStateManager.translatef(0.0F, 0.1F, 0.0F);
             GlStateManager.rotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
             GlStateManager.rotatef((float) (this.renderManager.options != null && this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
             GlStateManager.scalef(0.3F, 0.3F, 0.3F);
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder vertexbuffer = tessellator.getBuffer();
+            
+            int startRed = 0;
+            int startGreen = 102;
+            int startBlue = 255;
+            
+            int endRed = 20;
+            int endGreen = 204;
+            int endBlue = 255;
+            
+            // 255, 102, 0
+            float ratio = (MathHelper.sin(entity.ticksExisted / 2)+1) / 2;
+            int red = (int)Math.abs((ratio * startRed) + ((1 - ratio) * endRed));
+            int green = (int)Math.abs((ratio * startGreen) + ((1 - ratio) * endGreen));
+            int blue = (int)Math.abs((ratio * startBlue) + ((1 - ratio) * endBlue));
+            
             vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
-            vertexbuffer.pos(-1, -1, 0.0D).tex((double) f, (double) f3).color(l, 255, j1, 128).normal(0.0F, 1.0F, 0.0F).endVertex();
-            vertexbuffer.pos(1, -1, 0.0D).tex((double) f1, (double) f3).color(l, 255, j1, 128).normal(0.0F, 1.0F, 0.0F).endVertex();
-            vertexbuffer.pos(1, 1, 0.0D).tex((double) f1, (double) f2).color(l, 255, j1, 128).normal(0.0F, 1.0F, 0.0F).endVertex();
-            vertexbuffer.pos(-1, 1, 0.0D).tex((double) f, (double) f2).color(l, 255, j1, 128).normal(0.0F, 1.0F, 0.0F).endVertex();
+            vertexbuffer.pos(-1, -1, 0.0D).tex((double) f, (double) f3).color(red, green, blue, 128).normal(0.0F, 1.0F, 0.0F).endVertex();
+            vertexbuffer.pos(1, -1, 0.0D).tex((double) f1, (double) f3).color(red, green, blue, 128).normal(0.0F, 1.0F, 0.0F).endVertex();
+            vertexbuffer.pos(1, 1, 0.0D).tex((double) f1, (double) f2).color(red, green, blue, 128).normal(0.0F, 1.0F, 0.0F).endVertex();
+            vertexbuffer.pos(-1, 1, 0.0D).tex((double) f, (double) f2).color(red, green, blue, 128).normal(0.0F, 1.0F, 0.0F).endVertex();
             tessellator.draw();
             GlStateManager.disableBlend();
             GlStateManager.disableRescaleNormal();
             GlStateManager.popMatrix();
-            //            super.doRender(entity, x, y, z, entityYaw, partialTicks);
         }
     }
     
-    
-    /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
-     */
+    @Override
     protected ResourceLocation getEntityTexture(EntityXPOrbBig entity) {
         return EXPERIENCE_ORB_TEXTURES;
-    }
-    
-    public static class Factory implements IRenderFactory<EntityXPOrbBig> {
-        
-        @Override
-        public EntityRenderer<? super EntityXPOrbBig> createRenderFor(EntityRendererManager manager) {
-            return new RenderXPOrbBig(manager);
-        }
     }
 }

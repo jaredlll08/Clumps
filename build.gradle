@@ -19,7 +19,7 @@ archivesBaseName = 'modid'
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190621-1.14.2'
+    mappings channel: 'snapshot', version: '20191001-1.14.3'
     runs {
         client {
             workingDirectory project.file('run')
@@ -74,7 +74,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.3-27.0.50'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.1.26'
 
 }
 
