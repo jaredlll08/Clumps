@@ -117,13 +117,15 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
             int newSize = 0;
             if(orbs.size() > 0) {
                 EntityXPOrbBig orb = orbs.get(world.rand.nextInt(orbs.size()));
-                if(!orb.getUniqueID().equals(this.getUniqueID()) && orb.xpValue <= this.xpValue) {
+                if(!orb.getUniqueID().equals(this.getUniqueID()) && orb.xpValue <= this.xpValue && orb.xpValue != 0) {
                     newSize += orb.getXpValue() + xpValue;
-                    orb.remove();
+                    // This doesn't cause removed packets and kills the orb the next time it ticks
+                    orb.xpValue = 0;
                 }
                 if(newSize > xpValue) {
                     if(!world.isRemote) {
                         EntityXPOrbBig norb = new EntityXPOrbBig(world, getPosX(), getPosY(), getPosZ(), newSize);
+                        norb.setMotion(0, 0, 0);
                         world.addEntity(norb);
                         remove();
                     }
@@ -143,27 +145,25 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
      */
     public void onCollideWithPlayer(PlayerEntity entityIn) {
         if(!this.world.isRemote) {
-            if(this.delayBeforeCanPickup == 0 && entityIn.xpCooldown == 0) {
-                if(net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PlayerXpEvent.PickupXp(entityIn, this)))
-                    return;
-                entityIn.xpCooldown = 2;
-                entityIn.onItemPickup(this, 1);
-                Map.Entry<EquipmentSlotType, ItemStack> entry = EnchantmentHelper.getRandomItemWithEnchantment(Enchantments.MENDING, entityIn);
-                if(entry != null) {
-                    ItemStack itemstack = entry.getValue();
-                    if(!itemstack.isEmpty() && itemstack.isDamaged()) {
-                        int i = Math.min((int) (this.xpValue * itemstack.getXpRepairRatio()), itemstack.getDamage());
-                        this.xpValue -= this.durabilityToXp(i);
-                        itemstack.setDamage(itemstack.getDamage() - i);
-                    }
+            if(net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PlayerXpEvent.PickupXp(entityIn, this)))
+                return;
+            entityIn.xpCooldown = 0;
+            entityIn.onItemPickup(this, 1);
+            Map.Entry<EquipmentSlotType, ItemStack> entry = EnchantmentHelper.getRandomItemWithEnchantment(Enchantments.MENDING, entityIn);
+            if(entry != null) {
+                ItemStack itemstack = entry.getValue();
+                if(!itemstack.isEmpty() && itemstack.isDamaged()) {
+                    int i = Math.min((int) (this.xpValue * itemstack.getXpRepairRatio()), itemstack.getDamage());
+                    this.xpValue -= this.durabilityToXp(i);
+                    itemstack.setDamage(itemstack.getDamage() - i);
                 }
-                
-                if(this.xpValue > 0) {
-                    entityIn.giveExperiencePoints(this.xpValue);
-                }
-                
-                this.remove();
             }
+            
+            if(this.xpValue > 0) {
+                entityIn.giveExperiencePoints(this.xpValue);
+            }
+            
+            this.remove();
             
         }
     }
