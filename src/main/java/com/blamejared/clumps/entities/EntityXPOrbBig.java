@@ -70,7 +70,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
             this.playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.4F, 2.0F + this.rand.nextFloat() * 0.4F);
         }
         
-        if(!this.world.func_226664_a_(this.getBoundingBox())) {
+        if(!this.world.hasNoCollisions(this.getBoundingBox())) {
             this.pushOutOfBlocks(this.getPosX(), (this.getBoundingBox().minY + this.getBoundingBox().maxY) / 2.0D, this.getPosZ());
         }
         
