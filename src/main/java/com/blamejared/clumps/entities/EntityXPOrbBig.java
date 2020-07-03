@@ -1,22 +1,28 @@
 package com.blamejared.clumps.entities;
 
 import com.blamejared.clumps.Clumps;
-import net.minecraft.enchantment.*;
-import net.minecraft.entity.*;
+import java.util.List;
+import java.util.Map;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ExperienceOrbEntity;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.*;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.util.*;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
-
-import java.util.*;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.EntityPredicates;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.world.World;
 
 public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditionalSpawnData {
     
