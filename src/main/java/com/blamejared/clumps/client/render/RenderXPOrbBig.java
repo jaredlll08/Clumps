@@ -4,16 +4,17 @@ import com.blamejared.clumps.entities.EntityXPOrbBig;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import javax.annotation.Nonnull;
-import net.minecraft.client.renderer.culling.ClippingHelperImpl;
+import net.minecraft.client.renderer.culling.ClippingHelper;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Matrix3f;
-import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Matrix3f;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.ResourceLocation;
 
 public class RenderXPOrbBig extends EntityRenderer<EntityXPOrbBig> {
@@ -28,11 +29,11 @@ public class RenderXPOrbBig extends EntityRenderer<EntityXPOrbBig> {
     }
     
     @Override
-    public boolean shouldRender(EntityXPOrbBig livingEntityIn, ClippingHelperImpl camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityXPOrbBig livingEntityIn, ClippingHelper camera, double camX, double camY, double camZ) {
         return true;
     }
     
-    protected int getBlockLight(EntityXPOrbBig entityIn, float partialTicks) {
+    protected int getBlockLight(EntityXPOrbBig entityIn, BlockPos partialTicks) {
         return MathHelper.clamp(super.getBlockLight(entityIn, partialTicks) + 7, 0, 15);
     }
     
