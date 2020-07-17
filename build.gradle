@@ -32,8 +32,14 @@ archivesBaseName = 'Clumps'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
+repositories {
+    maven {
+        url 'https://dogforce-games.com/maven'
+    }
+}
+
 minecraft {
-    mappings channel: 'snapshot', version: '20200225-1.15.1'
+    mappings channel: 'snapshot', version: '20200712-1.16.1'
     runs {
         client {
             workingDirectory project.file('run')
@@ -113,8 +119,7 @@ task genGitChangelog() {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.1.25'
-
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.63'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -227,7 +232,7 @@ task updateVersionTracker {
         def body = [
                 'author'        : "${project.findProperty('versionTrackerAuthor')}",
                 'projectName'   : "clumps",
-                'gameVersion'   : "1.15.2",
+                'gameVersion'   : "1.16.1",
                 'projectVersion': "${version}",
                 'homepage'      : "${project.findProperty('versionTrackerHomepage')}",
                 'uid'           : "${project.findProperty('versionTrackerKey')}"
