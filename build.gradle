@@ -8,11 +8,25 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
+plugins {
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+}
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
+apply from: 'https://raw.githubusercontent.com/MinecraftModDevelopment/Gradle-Collection/22e7d543a18cd30675277fbfa3669e3d9e206010/generic/secrets.gradle'
+
+import groovy.json.JsonOutput
+
+if (project.hasProperty('secretFile')) {
+    loadSecrets(new File((String) findProperty('secretFile')))
+}
+
 version = '5.0.1'
+if (System.getenv('BUILD_NUMBER') != null) {
+    version += "." + System.getenv('BUILD_NUMBER')
+}
 group = 'com.blamejared.clumps' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'Clumps'
 
@@ -73,6 +87,31 @@ minecraft {
     }
 }
 
+task genGitChangelog() {
+    def stdout = new ByteArrayOutputStream()
+    // first commit to check from, in our case the first commit of the branch
+    String firstCommit = "e560215ad8146d65767585e53ef5c420b2c490cb";
+    String repoLink = "https://github.com/jaredlll08/Clumps/commit/"
+    // was having issues with grep and spaces in the regex
+    exec {
+        commandLine 'git', 'log', '-i', '--grep=version\\spush', '--grep=open\\sbeta\\sspecific\\scode', '--pretty=tformat:%H', '--date=local', firstCommit + '..@{0}'
+        standardOutput = stdout
+    }
+    if (stdout.toString().trim().indexOf("\n") >= 0) {
+        firstCommit = stdout.toString().split("\n")[0].trim();
+    }
+    System.out.println("Last version hash: \"" + firstCommit + "\"");
+    stdout = new ByteArrayOutputStream()
+    def test = exec {
+        commandLine 'git', 'log', '--pretty=tformat:- [%s](' + repoLink + '%H) - %aN - %cd', '--max-parents=1', '--date=local', firstCommit + "..@"
+        standardOutput = stdout
+    }
+    File file = new File("changelog.md")
+    file.write("### Current version: " + project.version)
+    file.append("\n" + stdout.toString())
+    System.out.println("Changelog generated!")
+}
+
 dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.1.25'
 
@@ -93,24 +132,118 @@ jar {
     }
 }
 
-// Example configuration to allow publishing using the maven-publish task
-// we define a custom artifact that is sourced from the reobfJar output task
-// and then declare that to be published
-// Note you'll need to add a repository here
-def reobfFile = file("$buildDir/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
+task sourcesJar(type: Jar, dependsOn: classes) {
+    description = 'Creates a JAR containing the source code.'
+    from sourceSets.main.allSource
+    classifier = 'sources'
 }
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    description = 'Creates a JAR containing the JavaDocs.'
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+task deobfJar(type: Jar) {
+    description = 'Creates a JAR containing the non-obfuscated compiled code.'
+    from sourceSets.main.output
+    classifier = "deobf"
+}
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+    archives deobfJar
+}
+
 publishing {
+
     publications {
+
         mavenJava(MavenPublication) {
-            artifact reobfArtifact
+
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+            from components.java
+
+            // Allows the maven pom file to be modified.
+            pom.withXml {
+
+                // Go through all the dependencies.
+                asNode().dependencies.dependency.each { dep ->
+
+                    println 'Surpressing artifact ' + dep.artifactId.last().value().last() + ' from maven dependencies.'
+                    assert dep.parent().remove(dep)
+                }
+            }
+
+            artifact sourcesJar {
+
+                classifier 'sources'
+            }
+            artifact javadocJar {
+
+                classifier 'javadoc'
+            }
+            artifact deobfJar {
+
+                classifier 'deobf'
+            }
         }
     }
+
     repositories {
+
         maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
+
+            url "file://" + System.getenv("local_maven")
         }
     }
+}
+
+curseforge {
+
+    apiKey = findProperty('curseforge_api_token') ?: 0
+    project {
+        id = "256717"
+        releaseType = 'release'
+        changelog = file("changelog.md")
+        changelogType = 'markdown'
+
+//        addArtifact(sourcesJar)
+//        addArtifact(javadocJar)
+        addArtifact(deobfJar)
+    }
+}
+
+task updateVersionTracker {
+
+    onlyIf {
+
+        project.hasProperty('versionTrackerAPI')
+    }
+
+    doLast {
+        def body = [
+                'author'        : "${project.findProperty('versionTrackerAuthor')}",
+                'projectName'   : "clumps",
+                'gameVersion'   : "1.16.1",
+                'projectVersion': "${version}",
+                'homepage'      : "${project.findProperty('versionTrackerHomepage')}",
+                'uid'           : "${project.findProperty('versionTrackerKey')}"
+        ]
+
+        // Opens a connection to the version tracker API and writes the payload JSON.
+        def req = new URL(project.findProperty('versionTrackerAPI')).openConnection()
+        req.setRequestMethod('POST')
+        req.setRequestProperty('Content-Type', 'application/json; charset=UTF-8')
+        req.setRequestProperty('User-Agent', "Clumps Tracker Gradle")
+        req.setDoOutput(true)
+        req.getOutputStream().write(JsonOutput.toJson(body).getBytes("UTF-8"))
+
+        // We need to attempt a read in order to actually send the message.
+        println "VersionCheck Status code: ${req.getResponseCode()}"
+        println "VersionCheck Response: ${req.getInputStream().getText()}"
+    }
+
 }
