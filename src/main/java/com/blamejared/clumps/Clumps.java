@@ -20,18 +20,18 @@ import java.util.stream.Collectors;
 @Mod(Clumps.MODID)
 public class Clumps {
     
-	public static final String MODID = "clumps";
+    public static final String MODID = "clumps";
     public static final EntityType<EntityXPOrbBig> BIG_ORB_ENTITY_TYPE = EntityType.Builder.<EntityXPOrbBig> create(EntityClassification.MISC).size(0.5f, 0.5f).setCustomClientFactory((pkt, world) -> new EntityXPOrbBig(world)).build(Clumps.MODID + ":xp_orb_big");
     
     public Clumps() {
-    	
-    	DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> FMLJavaModLoadingContext.get().getModEventBus().addListener(ClumpsClient::setupClient));
+        
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> FMLJavaModLoadingContext.get().getModEventBus().addListener(ClumpsClient::setupClient));
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, this::registerEntity);
         MinecraftForge.EVENT_BUS.addListener(this::update);
     }
     
     private void registerEntity(Register<EntityType<?>> register) {
-    	
+        
         register.getRegistry().register(BIG_ORB_ENTITY_TYPE.setRegistryName(Clumps.MODID, "xp_orb_big"));
     }
     
