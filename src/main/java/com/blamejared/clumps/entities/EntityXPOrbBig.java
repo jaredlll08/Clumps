@@ -66,7 +66,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
             this.setMotion(this.getMotion().add(0.0D, -0.03D, 0.0D));
         }
         
-        if(this.world.getFluidState(this.func_233580_cy_()).isTagged(FluidTags.LAVA)) {
+        if(this.world.getFluidState(this.getPosition()).isTagged(FluidTags.LAVA)) {
             this.setMotion((double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F), (double) 0.2F, (double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F));
             this.playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.4F, 2.0F + this.rand.nextFloat() * 0.4F);
         }
