@@ -14,8 +14,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Mod(Clumps.MODID)
 public class Clumps {
@@ -27,7 +26,9 @@ public class Clumps {
         
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> FMLJavaModLoadingContext.get().getModEventBus().addListener(ClumpsClient::setupClient));
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, this::registerEntity);
+        MinecraftForge.EVENT_BUS.addListener(this::joinWorld);
         MinecraftForge.EVENT_BUS.addListener(this::update);
+    
     }
     
     private void registerEntity(Register<EntityType<?>> register) {
@@ -35,19 +36,29 @@ public class Clumps {
         register.getRegistry().register(BIG_ORB_ENTITY_TYPE.setRegistryName(Clumps.MODID, "xp_orb_big"));
     }
     
+    private static final List<ExperienceOrbEntity> orbs = new ArrayList<>();
+    
     private void update(TickEvent.WorldTickEvent e) {
-        if(e.world.isRemote) {
+        if(e.world.isRemote || e.phase == TickEvent.Phase.START) {
             return;
         }
-        
         if(e.world instanceof ServerWorld) {
-            ServerWorld world = (ServerWorld) e.world;
-            List<ExperienceOrbEntity> entities = world.getEntities(EntityType.EXPERIENCE_ORB, Entity::isAlive).stream().filter(entity -> entity instanceof ExperienceOrbEntity).map(entity -> (ExperienceOrbEntity) entity).collect(Collectors.toList());
-            for(ExperienceOrbEntity entity : entities) {
-                EntityXPOrbBig bigOrb = new EntityXPOrbBig(world, entity.getPosX(), entity.getPosY(), entity.getPosZ(), entity.xpValue);
+            ArrayList<ExperienceOrbEntity> list = new ArrayList<>(orbs);
+            for(ExperienceOrbEntity entity : list) {
+                EntityXPOrbBig bigOrb = new EntityXPOrbBig(entity.getEntityWorld(), entity.getPosX(), entity.getPosY(), entity.getPosZ(), entity.xpValue);
                 bigOrb.setMotion(entity.getMotion());
-                world.addEntity(bigOrb);
+                entity.getEntityWorld().addEntity(bigOrb);
                 entity.remove();
+            }
+            orbs.removeAll(list);
+        }
+    }
+    
+    private void joinWorld(EntityJoinWorldEvent e) {
+        if(e.getEntity() instanceof ExperienceOrbEntity && !(e.getEntity() instanceof EntityXPOrbBig)) {
+            World world = e.getEntity().world;
+            if(!world.isRemote) {
+                orbs.add((ExperienceOrbEntity) e.getEntity());
             }
         }
     }
