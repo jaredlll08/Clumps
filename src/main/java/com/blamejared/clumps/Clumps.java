@@ -43,12 +43,11 @@ public class Clumps {
             return;
         }
         if(e.world instanceof ServerWorld) {
-            ServerWorld world = (ServerWorld) e.world;
             ArrayList<ExperienceOrbEntity> list = new ArrayList<>(orbs);
             for(ExperienceOrbEntity entity : list) {
-                EntityXPOrbBig bigOrb = new EntityXPOrbBig(world, entity.getPosX(), entity.getPosY(), entity.getPosZ(), entity.xpValue);
+                EntityXPOrbBig bigOrb = new EntityXPOrbBig(entity.getEntityWorld(), entity.getPosX(), entity.getPosY(), entity.getPosZ(), entity.xpValue);
                 bigOrb.setMotion(entity.getMotion());
-                world.addEntity(bigOrb);
+                entity.getEntityWorld().addEntity(bigOrb);
                 entity.remove();
             }
             orbs.removeAll(list);
