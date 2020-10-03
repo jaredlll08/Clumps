@@ -1,6 +1,9 @@
 package com.blamejared.clumps;
 
 import com.blamejared.clumps.entities.EntityXPOrbBig;
+import com.blamejared.clumps.events.EXPCloneEvent;
+import com.blamejared.clumps.events.EXPMergeEvent;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.*;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.world.World;
@@ -46,6 +49,8 @@ public class Clumps {
             ArrayList<ExperienceOrbEntity> list = new ArrayList<>(orbs);
             for(ExperienceOrbEntity entity : list) {
                 EntityXPOrbBig bigOrb = new EntityXPOrbBig(entity.getEntityWorld(), entity.getPosX(), entity.getPosY(), entity.getPosZ(), entity.xpValue);
+                MinecraftForge.EVENT_BUS.post(new EXPCloneEvent(entity, bigOrb));
+
                 bigOrb.setMotion(entity.getMotion());
                 entity.getEntityWorld().addEntity(bigOrb);
                 entity.remove();

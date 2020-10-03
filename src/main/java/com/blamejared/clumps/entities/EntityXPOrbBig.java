@@ -1,6 +1,7 @@
 package com.blamejared.clumps.entities;
 
 import com.blamejared.clumps.Clumps;
+import com.blamejared.clumps.events.EXPMergeEvent;
 import net.minecraft.enchantment.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.item.ExperienceOrbEntity;
@@ -13,6 +14,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -120,16 +122,19 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
                 EntityXPOrbBig orb = orbs.get(world.rand.nextInt(orbs.size()));
                 if(!orb.getUniqueID().equals(this.getUniqueID()) && orb.xpValue <= this.xpValue && orb.xpValue != 0) {
                     newSize += orb.getXpValue() + xpValue;
-                    // This doesn't cause removed packets and kills the orb the next time it ticks
-                    orb.xpValue = 0;
                 }
                 if(newSize > xpValue) {
                     if(!world.isRemote) {
-                        EntityXPOrbBig norb = new EntityXPOrbBig(world, getPosX(), getPosY(), getPosZ(), newSize);
-                        norb.setMotion(0, 0, 0);
-                        world.addEntity(norb);
+                        EntityXPOrbBig newOrb = new EntityXPOrbBig(world, getPosX(), getPosY(), getPosZ(), newSize);
+                        MinecraftForge.EVENT_BUS.post(new EXPMergeEvent(this, orb, newOrb));
+
+                        newOrb.setMotion(0, 0, 0);
+                        world.addEntity(newOrb);
                         remove();
                     }
+                    // This doesn't cause removed packets and kills the orb the next time it ticks
+                    // This line has also been moved here so the orb's xpValue is still correct in the EXPMergeEvent
+                    orb.xpValue = 0;
                 }
                 orbs.clear();
             }
