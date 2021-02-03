@@ -32,12 +32,15 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
      */
     private int xpTargetColor;
     
-    public EntityXPOrbBig(World worldIn, double x, double y, double z, int expValue) {
+    private int clumpedOrbs;
+    
+    public EntityXPOrbBig(World worldIn, double x, double y, double z, int expValue, int clumpedOrbs) {
         super(Clumps.BIG_ORB_ENTITY_TYPE, worldIn);
         this.setPosition(x, y, z);
         this.rotationYaw = (float) (this.rand.nextDouble() * 360.0D);
         this.setMotion((this.rand.nextDouble() * (double) 0.2F - (double) 0.1F) * 2.0D, this.rand.nextDouble() * 0.2D * 2.0D, (this.rand.nextDouble() * (double) 0.2F - (double) 0.1F) * 2.0D);
         this.xpValue = expValue;
+        this.clumpedOrbs = clumpedOrbs;
     }
     
     public EntityXPOrbBig(EntityType<? extends ExperienceOrbEntity> type, World world) {
@@ -117,15 +120,17 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
         }
         if(world.getGameTime() % 5 == 0) {
             List<EntityXPOrbBig> orbs = world.getEntitiesWithinAABB(EntityXPOrbBig.class, new AxisAlignedBB(getPosX() - 2, getPosY() - 2, getPosZ() - 2, getPosX() + 2, getPosY() + 2, getPosZ() + 2), EntityPredicates.IS_ALIVE);
-            int newSize = 0;
+            int newSize = xpValue;
+            int newClumpedOrbs = clumpedOrbs;
             if(orbs.size() > 0) {
                 EntityXPOrbBig orb = orbs.get(world.rand.nextInt(orbs.size()));
                 if(!orb.getUniqueID().equals(this.getUniqueID()) && orb.xpValue <= this.xpValue && orb.xpValue != 0) {
-                    newSize += orb.getXpValue() + xpValue;
+                    newSize += orb.getXpValue();
+                    newClumpedOrbs += orb.clumpedOrbs;
                 }
                 if(newSize > xpValue) {
                     if(!world.isRemote) {
-                        EntityXPOrbBig newOrb = new EntityXPOrbBig(world, getPosX(), getPosY(), getPosZ(), newSize);
+                        EntityXPOrbBig newOrb = new EntityXPOrbBig(world, getPosX(), getPosY(), getPosZ(), newSize, newClumpedOrbs);
                         MinecraftForge.EVENT_BUS.post(new EXPMergeEvent(this, orb, newOrb));
 
                         newOrb.setMotion(0, 0, 0);
@@ -135,6 +140,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
                     // This doesn't cause removed packets and kills the orb the next time it ticks
                     // This line has also been moved here so the orb's xpValue is still correct in the EXPMergeEvent
                     orb.xpValue = 0;
+                    orb.clumpedOrbs = 0;
                 }
                 orbs.clear();
             }
@@ -155,16 +161,19 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
                 return;
             entityIn.xpCooldown = 0;
             entityIn.onItemPickup(this, 1);
-            Map.Entry<EquipmentSlotType, ItemStack> entry = EnchantmentHelper.getRandomItemWithEnchantment(Enchantments.MENDING, entityIn);
-            if(entry != null) {
-                ItemStack itemstack = entry.getValue();
-                if(!itemstack.isEmpty() && itemstack.isDamaged()) {
-                    int i = Math.min((int) (this.xpValue * itemstack.getXpRepairRatio()), itemstack.getDamage());
-                    this.xpValue -= this.durabilityToXp(i);
-                    itemstack.setDamage(itemstack.getDamage() - i);
+            for(int j = 0; j < clumpedOrbs; j++) {
+                int workingXPValue = this.xpValue / Math.max(1, clumpedOrbs);
+    
+                Map.Entry<EquipmentSlotType, ItemStack> entry = EnchantmentHelper.getRandomItemWithEnchantment(Enchantments.MENDING, entityIn);
+                if(entry != null) {
+                    ItemStack itemstack = entry.getValue();
+                    if(!itemstack.isEmpty() && itemstack.isDamaged()) {
+                        int i = Math.min((int) (workingXPValue * itemstack.getXpRepairRatio()), itemstack.getDamage());
+                        this.xpValue -= this.durabilityToXp(i);
+                        itemstack.setDamage(itemstack.getDamage() - i);
+                    }
                 }
             }
-            
             if(this.xpValue > 0) {
                 entityIn.giveExperiencePoints(this.xpValue);
             }
@@ -186,10 +195,12 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
     @Override
     public void writeSpawnData(PacketBuffer buffer) {
         buffer.writeInt(this.xpValue);
+        buffer.writeInt(this.clumpedOrbs);
     }
     
     @Override
     public void readSpawnData(PacketBuffer additionalData) {
         this.xpValue = additionalData.readInt();
+        this.clumpedOrbs = additionalData.readInt();
     }
 }

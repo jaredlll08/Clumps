@@ -51,7 +51,7 @@ public class Clumps {
             Iterator<ExperienceOrbEntity> it = orbs.iterator();
             while(it.hasNext()) {
                 ExperienceOrbEntity entity = it.next();
-                EntityXPOrbBig bigOrb = new EntityXPOrbBig(entity.getEntityWorld(), entity.getPosX(), entity.getPosY(), entity.getPosZ(), entity.xpValue);
+                EntityXPOrbBig bigOrb = new EntityXPOrbBig(entity.getEntityWorld(), entity.getPosX(), entity.getPosY(), entity.getPosZ(), entity.xpValue, 1);
                 MinecraftForge.EVENT_BUS.post(new EXPCloneEvent(entity, bigOrb));
 
                 bigOrb.setMotion(entity.getMotion());
