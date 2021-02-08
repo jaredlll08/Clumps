@@ -212,6 +212,9 @@ curseforge {
 //        addArtifact(sourcesJar)
 //        addArtifact(javadocJar)
         addArtifact(deobfJar)
+        relations {
+            incompatible 'mcmt-multithreading' // https://github.com/jediminer543/JMT-MCMT/issues/38
+        }
     }
 }
 
