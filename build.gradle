@@ -113,7 +113,7 @@ task genGitChangelog() {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.4-35.1.13'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.0.22'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -229,7 +229,7 @@ task updateVersionTracker {
         def body = [
                 'author'        : "${project.findProperty('versionTrackerAuthor')}",
                 'projectName'   : "clumps",
-                'gameVersion'   : "1.16.4",
+                'gameVersion'   : "1.16.5",
                 'projectVersion': "${version}",
                 'homepage'      : "${project.findProperty('versionTrackerHomepage')}",
                 'uid'           : "${project.findProperty('versionTrackerKey')}"
