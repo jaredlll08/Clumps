@@ -35,7 +35,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
     private int clumpedOrbs;
     
     public EntityXPOrbBig(World worldIn, double x, double y, double z, int expValue, int clumpedOrbs) {
-        super(Clumps.BIG_ORB_ENTITY_TYPE, worldIn);
+        super(Clumps.BIG_ORB_ENTITY_TYPE.get(), worldIn);
         this.setPosition(x, y, z);
         this.rotationYaw = (float) (this.rand.nextDouble() * 360.0D);
         this.setMotion((this.rand.nextDouble() * (double) 0.2F - (double) 0.1F) * 2.0D, this.rand.nextDouble() * 0.2D * 2.0D, (this.rand.nextDouble() * (double) 0.2F - (double) 0.1F) * 2.0D);
@@ -44,13 +44,9 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
     }
     
     public EntityXPOrbBig(EntityType<? extends ExperienceOrbEntity> type, World world) {
-        super(Clumps.BIG_ORB_ENTITY_TYPE, world);
+        super(type, world);
     }
-    
-    public EntityXPOrbBig(World world) {
-        super(Clumps.BIG_ORB_ENTITY_TYPE, world);
-    }
-    
+
     @Override
     public void tick() {
         if(!world.isRemote && this.xpValue == 0) {

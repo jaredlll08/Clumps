@@ -8,40 +8,45 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent.Register;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import java.util.*;
 
 @Mod(Clumps.MODID)
 public class Clumps {
     
     public static final String MODID = "clumps";
-    @ObjectHolder(Clumps.MODID + ":xp_orb_big")
-    public static final EntityType<EntityXPOrbBig> BIG_ORB_ENTITY_TYPE = null;
+
+    private static final DeferredRegister<EntityType<?>> DEFERRED_REGISTER = DeferredRegister.create(ForgeRegistries.ENTITIES, MODID);
+    public static final RegistryObject<EntityType<EntityXPOrbBig>> BIG_ORB_ENTITY_TYPE = DEFERRED_REGISTER.register("xp_orb_big", () -> EntityType.Builder.<EntityXPOrbBig>create(EntityXPOrbBig::new, EntityClassification.MISC).size(0.5f, 0.5f).build(MODID + ":xp_orb_big"));
     
     public Clumps() {
         final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus(),
                 forgeBus = MinecraftForge.EVENT_BUS;
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modBus.addListener(ClumpsClient::setupClient));
-        modBus.addGenericListener(EntityType.class, this::registerEntity);
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClumpsClient::register);
+        DEFERRED_REGISTER.register(modBus);
+        modBus.addListener(this::setup);
         forgeBus.addListener(this::joinWorld);
         forgeBus.addListener(this::update);
     
     }
-    
-    private void registerEntity(Register<EntityType<?>> register) {
-        register.getRegistry().register(EntityType.Builder.create((type, world) -> new EntityXPOrbBig(world), EntityClassification.MISC).size(0.5f, 0.5f).build(Clumps.MODID + ":xp_orb_big").setRegistryName(Clumps.MODID, "xp_orb_big"));
-    }
-    
+
     private static final List<ExperienceOrbEntity> orbs = new ArrayList<>();
+
+    private void setup(FMLCommonSetupEvent e) {
+        ObfuscationReflectionHelper.setPrivateValue(EntityType.class, BIG_ORB_ENTITY_TYPE.get(), EntityType.EXPERIENCE_ORB.getTranslationKey(), "field_210762_aX");
+    }
     
     private void update(TickEvent.WorldTickEvent e) {
         if(e.world.isRemote || e.phase == TickEvent.Phase.START) {
@@ -63,7 +68,7 @@ public class Clumps {
     }
     
     private void joinWorld(EntityJoinWorldEvent e) {
-        if(e.getEntity() instanceof ExperienceOrbEntity && !(e.getEntity() instanceof EntityXPOrbBig)) {
+        if(e.getEntity() instanceof ExperienceOrbEntity && e.getEntity().getType() != BIG_ORB_ENTITY_TYPE.get()) {
             World world = e.getEntity().world;
             if(!world.isRemote) {
                 orbs.add((ExperienceOrbEntity) e.getEntity());
