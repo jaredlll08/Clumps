@@ -157,9 +157,8 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
                 return;
             entityIn.xpCooldown = 0;
             entityIn.onItemPickup(this, 1);
+            int workingXPValue = this.xpValue / Math.max(1, clumpedOrbs);
             for(int j = 0; j < clumpedOrbs; j++) {
-                int workingXPValue = this.xpValue / Math.max(1, clumpedOrbs);
-    
                 Map.Entry<EquipmentSlotType, ItemStack> entry = EnchantmentHelper.getRandomItemWithEnchantment(Enchantments.MENDING, entityIn);
                 if(entry != null) {
                     ItemStack itemstack = entry.getValue();
