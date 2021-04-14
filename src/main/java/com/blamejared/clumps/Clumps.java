@@ -56,7 +56,9 @@ public class Clumps {
             Iterator<ExperienceOrbEntity> it = orbs.iterator();
             while(it.hasNext()) {
                 ExperienceOrbEntity entity = it.next();
-                EntityXPOrbBig bigOrb = new EntityXPOrbBig(entity.getEntityWorld(), entity.getPosX(), entity.getPosY(), entity.getPosZ(), entity.xpValue, 1);
+                HashMap<Integer, Long> clumpedMap = new HashMap<>();
+                clumpedMap.put(entity.xpValue, 1L);
+                EntityXPOrbBig bigOrb = new EntityXPOrbBig(entity.getEntityWorld(), entity.getPosX(), entity.getPosY(), entity.getPosZ(), entity.xpValue, clumpedMap);
                 MinecraftForge.EVENT_BUS.post(new EXPCloneEvent(entity, bigOrb));
 
                 bigOrb.setMotion(entity.getMotion());

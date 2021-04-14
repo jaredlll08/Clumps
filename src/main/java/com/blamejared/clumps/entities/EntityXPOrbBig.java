@@ -8,6 +8,7 @@ import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.*;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.*;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import java.util.*;
+import java.util.stream.*;
 
 public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditionalSpawnData {
     
@@ -32,21 +34,22 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
      */
     private int xpTargetColor;
     
-    private int clumpedOrbs;
+    // Value -> amount map.
+    private Map<Integer, Long> clumpedMap;
     
-    public EntityXPOrbBig(World worldIn, double x, double y, double z, int expValue, int clumpedOrbs) {
+    public EntityXPOrbBig(World worldIn, double x, double y, double z, int expValue, Map<Integer, Long> clumpedMap) {
         super(Clumps.BIG_ORB_ENTITY_TYPE.get(), worldIn);
         this.setPosition(x, y, z);
         this.rotationYaw = (float) (this.rand.nextDouble() * 360.0D);
         this.setMotion((this.rand.nextDouble() * (double) 0.2F - (double) 0.1F) * 2.0D, this.rand.nextDouble() * 0.2D * 2.0D, (this.rand.nextDouble() * (double) 0.2F - (double) 0.1F) * 2.0D);
         this.xpValue = expValue;
-        this.clumpedOrbs = clumpedOrbs;
+        this.clumpedMap = clumpedMap;
     }
     
     public EntityXPOrbBig(EntityType<? extends ExperienceOrbEntity> type, World world) {
         super(type, world);
     }
-
+    
     @Override
     public void tick() {
         if(!world.isRemote && this.xpValue == 0) {
@@ -117,18 +120,18 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
         if(world.getGameTime() % 5 == 0) {
             List<EntityXPOrbBig> orbs = world.getEntitiesWithinAABB(EntityXPOrbBig.class, new AxisAlignedBB(getPosX() - 2, getPosY() - 2, getPosZ() - 2, getPosX() + 2, getPosY() + 2, getPosZ() + 2), EntityPredicates.IS_ALIVE);
             int newSize = xpValue;
-            int newClumpedOrbs = clumpedOrbs;
+            Map<Integer, Long> newClumpedMap = new HashMap<>(clumpedMap);
             if(orbs.size() > 0) {
                 EntityXPOrbBig orb = orbs.get(world.rand.nextInt(orbs.size()));
                 if(!orb.getUniqueID().equals(this.getUniqueID()) && orb.xpValue <= this.xpValue && orb.xpValue != 0) {
                     newSize += orb.getXpValue();
-                    newClumpedOrbs += orb.clumpedOrbs;
+                    newClumpedMap = Stream.of(newClumpedMap, orb.clumpedMap).flatMap(map -> map.entrySet().stream()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Long::sum));
                 }
                 if(newSize > xpValue) {
                     if(!world.isRemote) {
-                        EntityXPOrbBig newOrb = new EntityXPOrbBig(world, getPosX(), getPosY(), getPosZ(), newSize, newClumpedOrbs);
+                        EntityXPOrbBig newOrb = new EntityXPOrbBig(world, getPosX(), getPosY(), getPosZ(), newSize, newClumpedMap);
                         MinecraftForge.EVENT_BUS.post(new EXPMergeEvent(this, orb, newOrb));
-
+                        
                         newOrb.setMotion(0, 0, 0);
                         world.addEntity(newOrb);
                         remove();
@@ -136,7 +139,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
                     // This doesn't cause removed packets and kills the orb the next time it ticks
                     // This line has also been moved here so the orb's xpValue is still correct in the EXPMergeEvent
                     orb.xpValue = 0;
-                    orb.clumpedOrbs = 0;
+                    orb.clumpedMap.clear();
                 }
                 orbs.clear();
             }
@@ -157,18 +160,24 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
                 return;
             entityIn.xpCooldown = 0;
             entityIn.onItemPickup(this, 1);
-            int workingXPValue = this.xpValue / Math.max(1, clumpedOrbs);
-            for(int j = 0; j < clumpedOrbs; j++) {
-                Map.Entry<EquipmentSlotType, ItemStack> entry = EnchantmentHelper.getRandomItemWithEnchantment(Enchantments.MENDING, entityIn);
-                if(entry != null) {
-                    ItemStack itemstack = entry.getValue();
-                    if(!itemstack.isEmpty() && itemstack.isDamaged()) {
-                        int i = Math.min((int) (workingXPValue * itemstack.getXpRepairRatio()), itemstack.getDamage());
-                        this.xpValue -= this.durabilityToXp(i);
-                        itemstack.setDamage(itemstack.getDamage() - i);
+            
+            clumpedMap.forEach((value, amount) -> {
+                for(long _i = 0; _i < amount; _i++) {
+                    Map.Entry<EquipmentSlotType, ItemStack> entry = EnchantmentHelper.getRandomItemWithEnchantment(Enchantments.MENDING, entityIn);
+                    if(entry != null) {
+                        ItemStack itemstack = entry.getValue();
+                        if(!itemstack.isEmpty() && itemstack.isDamaged()) {
+                            int i = Math.min((int) (value * itemstack.getXpRepairRatio()), itemstack.getDamage());
+                            this.xpValue -= this.durabilityToXp(i);
+                            itemstack.setDamage(itemstack.getDamage() - i);
+                        }
+                    } else {
+                        // If we don't have any entries left, no need to continue looping
+                        return;
                     }
                 }
-            }
+            });
+            
             if(this.xpValue > 0) {
                 entityIn.giveExperiencePoints(this.xpValue);
             }
@@ -190,12 +199,63 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
     @Override
     public void writeSpawnData(PacketBuffer buffer) {
         buffer.writeInt(this.xpValue);
-        buffer.writeInt(this.clumpedOrbs);
+        // Still write an int for backwards compat - removal of clumpedOrbs
+        buffer.writeInt(0);
+        
+        if(this.clumpedMap == null) {
+            buffer.writeInt(0);
+        } else {
+            buffer.writeInt(this.clumpedMap.size());
+            this.clumpedMap.forEach((integer, aLong) -> {
+                buffer.writeInt(integer);
+                buffer.writeLong(aLong);
+            });
+        }
+        
     }
     
     @Override
     public void readSpawnData(PacketBuffer additionalData) {
         this.xpValue = additionalData.readInt();
-        this.clumpedOrbs = additionalData.readInt();
+        // still need to read an int for backwards compat - removal of clumpedOrbs
+        additionalData.readInt();
+        
+        int size = additionalData.readInt();
+        HashMap<Integer, Long> map = new HashMap<>();
+        for(int i = 0; i < size; i++) {
+            int value = additionalData.readInt();
+            long amount = additionalData.readLong();
+            map.put(value, amount);
+        }
+        this.clumpedMap = map;
+    }
+    
+    @Override
+    public void writeAdditional(CompoundNBT compound) {
+        super.writeAdditional(compound);
+        CompoundNBT value = new CompoundNBT();
+        clumpedMap.forEach((integer, aLong) -> {
+            value.putLong(integer + "", aLong);
+        });
+        compound.put("clumpedMap", value);
+    }
+    
+    @Override
+    public void readAdditional(CompoundNBT compound) {
+        super.readAdditional(compound);
+        Map<Integer, Long> map = new HashMap<>();
+        if(compound.contains("clumpedMap")) {
+            CompoundNBT clumpedMap = compound.getCompound("clumpedMap");
+            for(String s : clumpedMap.keySet()) {
+                map.put(Integer.parseInt(s), clumpedMap.getLong(s));
+            }
+        } else {
+            map.put(xpValue, 1L);
+        }
+        clumpedMap = map;
+    }
+    
+    public Map<Integer, Long> getClumpedMap() {
+        return clumpedMap;
     }
 }
