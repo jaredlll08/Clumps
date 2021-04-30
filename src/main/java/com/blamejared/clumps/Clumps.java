@@ -20,7 +20,7 @@ import java.util.*;
 public class Clumps {
     
     public static final String MODID = "clumps";
-    public static final EntityType<EntityXPOrbBig> BIG_ORB_ENTITY_TYPE = EntityType.Builder.<EntityXPOrbBig> create(EntityClassification.MISC).size(0.5f, 0.5f).setCustomClientFactory((pkt, world) -> new EntityXPOrbBig(world)).build(Clumps.MODID + ":xp_orb_big");
+    public static final EntityType<EntityXPOrbBig> BIG_ORB_ENTITY_TYPE = EntityType.Builder.<EntityXPOrbBig> create(EntityXPOrbBig::new, EntityClassification.MISC).size(0.5f, 0.5f).setCustomClientFactory((pkt, world) -> new EntityXPOrbBig(world)).build(Clumps.MODID + ":xp_orb_big");
     
     public Clumps() {
         
