@@ -48,6 +48,8 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
     
     public EntityXPOrbBig(EntityType<? extends ExperienceOrbEntity> type, World world) {
         super(type, world);
+        // Not ideal, but it is better than crashing and should be overwritten at a later stage by nbt deserialization.
+        this.clumpedMap = new HashMap<>();
     }
     
     @Override
@@ -116,6 +118,10 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
         ++this.xpOrbAge;
         if(this.xpOrbAge >= 6000) {
             this.remove();
+        }
+        if(clumpedMap == null){
+            // Not ideal, but better than crashing.
+            return;
         }
         if(world.getGameTime() % 5 == 0) {
             List<EntityXPOrbBig> orbs = world.getEntitiesWithinAABB(EntityXPOrbBig.class, new AxisAlignedBB(getPosX() - 2, getPosY() - 2, getPosZ() - 2, getPosX() + 2, getPosY() + 2, getPosZ() + 2), EntityPredicates.IS_ALIVE);
