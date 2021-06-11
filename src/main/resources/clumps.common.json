@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.blamejared.clumps.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "MixinExperienceOrb",
+    "ExperienceOrbAccess"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

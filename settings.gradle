@@ -1,1 +1,14 @@
+pluginManagement {
+    repositories {
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        maven {
+            name = "BlameJared"
+            url = 'https://maven.blamejared.com'
+        }
+        gradlePluginPortal()
+    }
+}
 rootProject.name = 'Clumps'

@@ -1,172 +1,74 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://maven.blamejared.com' }
-        jcenter()
+        maven {
+            name = "BlameJared"
+            url = 'https://maven.blamejared.com'
+        }
         mavenCentral()
     }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath group: 'com.blamejared', name: 'ModTemplate', version: '1.+', changing: true
-    }
 }
-plugins {
-    id "com.matthewprenger.cursegradle" version "1.4.0"
-}
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'com.blamejared.modtemplate'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
 
-version = '6.0.0'
+plugins {
+    id "fabric-loom" version "0.8-SNAPSHOT"
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+    id "maven-publish"
+}
+apply from: 'https://raw.githubusercontent.com/MinecraftModDevelopment/Gradle-Collection/master/generic/secrets.gradle'
+
+if (project.hasProperty('secretFile')) {
+    loadSecrets(new File((String) findProperty('secretFile')))
+}
+
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
+
+version = 'fabric-1.17-7.0.0' + ".${getBuildNumber()}"
 group = 'com.blamejared.clumps'
 archivesBaseName = 'Clumps'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
-
-minecraft {
-    mappings channel: 'snapshot', version: '20201028-1.16.3'
-    runs {
-        client {
-            workingDirectory project.file('run')
-
-            mods {
-                clumps {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run')
-
-            mods {
-                clumps {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-
-            args '--mod', 'clumps', '--all', '--output', file('src/generated/resources/')
-
-            mods {
-                clumps {
-                    source sourceSets.main
-                }
-            }
-        }
-    }
-}
-modTemplate {
-    mcVersion "1.16.5"
-    curseHomepage "https://www.curseforge.com/minecraft/mc-mods/clumps"
-    displayName "Clumps"
-
-    changelog {
-        enabled true
-        firstCommit "f55e1b9e9e9d2e7c1ebe2a7dee913c98d473b5c6"
-        repo "https://github.com/jaredlll08/Clumps"
-    }
-    versionTracker {
-        enabled true
-        author "Jared"
-        projectName "clumps"
-    }
-    webhook {
-        enabled true
-        curseId "256717"
-        avatarUrl "https://media.forgecdn.net/avatars/84/193/636193647832736518.gif"
-    }
-}
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.1.16'
+    minecraft "com.mojang:minecraft:1.17"
+    mappings minecraft.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:0.11.3"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.34.9+1.17"
 }
 
-jar {
-    manifest {
-        attributes([
-            "Specification-Title": "clumps",
-            "Specification-Vendor": "BlameJared",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"BlameJared",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
+
+processResources {
+
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+
+        expand "version": project.version
     }
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    description = 'Creates a JAR containing the source code.'
-    from sourceSets.main.allSource
-    classifier = 'sources'
+tasks.withType(JavaCompile) {
+
+    it.options.encoding = 'UTF-8'
+    it.options.release = 16
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    description = 'Creates a JAR containing the JavaDocs.'
-    from javadoc.destinationDir
-    classifier = 'javadoc'
+java {
+    withSourcesJar()
 }
-
-task deobfJar(type: Jar) {
-    description = 'Creates a JAR containing the non-obfuscated compiled code.'
-    from sourceSets.main.output
-    classifier = "deobf"
-}
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-    archives deobfJar
-}
-
-publish.dependsOn(project.tasks.getByName("assemble"))
-publish.mustRunAfter(project.tasks.getByName("build"))
 
 publishing {
-
     publications {
-
         mavenJava(MavenPublication) {
-
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
-            from components.java
-
-            // Allows the maven pom file to be modified.
-            pom.withXml {
-
-                // Go through all the dependencies.
-                asNode().dependencies.dependency.each { dep ->
-
-                    println 'Surpressing artifact ' + dep.artifactId.last().value().last() + ' from maven dependencies.'
-                    assert dep.parent().remove(dep)
-                }
+            artifact(remapJar) {
+                builtBy remapJar
             }
-
-            artifact sourcesJar {
-
-                classifier 'sources'
-            }
-            artifact javadocJar {
-
-                classifier 'javadoc'
-            }
-            artifact deobfJar {
-
-                classifier 'deobf'
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
             }
         }
     }
-
     repositories {
-
         maven {
-
+            // Sets the maven URL
             url "file://" + System.getenv("local_maven")
         }
     }
@@ -175,14 +77,33 @@ publishing {
 curseforge {
 
     apiKey = findProperty('curseforge_api_token') ?: 0
+    def versions = ["1.17", "1.17-Snapshot"]
+
     project {
         id = "256717"
         releaseType = 'release'
-        changelog = file("changelog.md")
+        changelog = "Port to Fabric"
         changelogType = 'markdown'
+        addGameVersion "Fabric"
 
-//        addArtifact(sourcesJar)
-//        addArtifact(javadocJar)
-        addArtifact(deobfJar)
+        versions.each {
+
+            addGameVersion "${it}"
+        }
+
+        mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+
+        afterEvaluate {
+            uploadTask.dependsOn(remapJar)
+        }
+    }
+    options {
+        forgeGradleIntegration = false;
     }
 }
+
+String getBuildNumber() {
+
+    return System.getenv('BUILD_NUMBER') ? System.getenv('BUILD_NUMBER') : System.getenv('TRAVIS_BUILD_NUMBER') ? System.getenv('TRAVIS_BUILD_NUMBER') : '0';
+}
+
