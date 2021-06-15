@@ -87,6 +87,7 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
         this.count = clumps$getClumpedMap().values().stream().reduce(Integer::sum).orElse(1);
         this.age = Math.min(this.age, ((ExperienceOrbAccess) experienceOrb).getAge());
+        experienceOrb.discard();
         ci.cancel();
     }
     
