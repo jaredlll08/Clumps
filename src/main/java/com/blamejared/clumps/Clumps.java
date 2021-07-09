@@ -64,8 +64,8 @@ public class Clumps {
                 bigOrb.setMotion(entity.getMotion());
                 entity.getEntityWorld().addEntity(bigOrb);
                 entity.remove();
-                it.remove();
             }
+            orbs.clear();
         }
     }
     
