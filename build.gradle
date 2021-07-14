@@ -22,13 +22,13 @@ if (project.hasProperty('secretFile')) {
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
 
-version = 'fabric-1.17-7.0.0' + ".${getBuildNumber()}"
+version = 'fabric-1.17.1-7.0.0' + ".${getBuildNumber()}"
 group = 'com.blamejared.clumps'
 archivesBaseName = 'Clumps'
 
 
 dependencies {
-    minecraft "com.mojang:minecraft:1.17"
+    minecraft "com.mojang:minecraft:1.17.1"
     mappings minecraft.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:0.11.3"
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.34.9+1.17"
@@ -77,12 +77,12 @@ publishing {
 curseforge {
 
     apiKey = findProperty('curseforge_api_token') ?: 0
-    def versions = ["1.17", "1.17-Snapshot"]
+    def versions = ["1.17.1", "1.17", "1.17-Snapshot"]
 
     project {
         id = "256717"
         releaseType = 'release'
-        changelog = "Port to Fabric"
+        changelog = "Port to 1.17.1"
         changelogType = 'markdown'
         addGameVersion "Fabric"
 
