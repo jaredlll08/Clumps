@@ -22,7 +22,7 @@ if (project.hasProperty('secretFile')) {
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
 
-version = 'fabric-1.17.1-7.0.0' + ".${getBuildNumber()}"
+version = "fabric-1.17.1-7.0.${getBuildNumber()}"
 group = 'com.blamejared.clumps'
 archivesBaseName = 'Clumps'
 
