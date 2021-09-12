@@ -1,0 +1,150 @@
+buildscript {
+    repositories {
+        maven {
+            name = "BlameJared"
+            url = 'https://maven.blamejared.com'
+        }
+    }
+    dependencies {
+        classpath group: 'com.blamejared', name: 'ModTemplate', version: '2.+', changing: true
+    }
+}
+
+plugins {
+    id 'fabric-loom' version '0.9-SNAPSHOT'
+    id 'maven-publish'
+    id 'idea'
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
+}
+apply plugin: 'com.blamejared.modtemplate'
+import com.blamejared.modtemplate.Utils
+
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
+
+archivesBaseName = "${mod_name}-fabric-${minecraft_version}"
+version = Utils.updatingVersion(mod_version)
+group = mod_group
+
+repositories {
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation project(":Common")
+}
+
+loom {
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+        }
+    }
+}
+
+modTemplate {
+    mcVersion minecraft_version
+    curseHomepage curse_homepage
+    displayName mod_name
+    modLoader "Fabric"
+    changelog {
+        enabled true
+        firstCommit git_first_commit
+        repo git_repo
+    }
+    versionTracker {
+        enabled true
+        author mod_author
+        projectName mod_name
+    }
+    webhook {
+        enabled true
+        curseId curse_project_id
+        avatarUrl mod_avatar
+    }
+}
+
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+
+    it.options.release = 16
+}
+
+java {
+    withSourcesJar()
+}
+
+jar {
+    dependsOn ":Common:compileJava"
+    from project(":Common").sourceSets.main.output
+    from("LICENSE") {
+        rename { "${it}_${mod_name}" }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+        }
+    }
+
+    repositories {
+
+        maven {
+
+            url "file://" + System.getenv("local_maven")
+        }
+    }
+}
+
+curseforge {
+
+    apiKey = findProperty('curseforge_api_token') ?: 0
+    def versions = [minecraft_version]
+
+    project {
+        id = curse_project_id
+        releaseType = 'release'
+        changelog = file("changelog.md")
+        changelogType = 'markdown'
+        addGameVersion "Fabric"
+
+        versions.each {
+
+            addGameVersion "${it}"
+        }
+
+        mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+
+        afterEvaluate {
+            uploadTask.dependsOn(remapJar)
+        }
+    }
+    options {
+        forgeGradleIntegration = false;
+    }
+}

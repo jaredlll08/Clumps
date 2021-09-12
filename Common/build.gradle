@@ -1,0 +1,38 @@
+buildscript {
+    repositories {
+        maven {
+            name = "BlameJared"
+            url = 'https://maven.blamejared.com'
+        }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    }
+    dependencies {
+        classpath group: 'com.blamejared', name: 'ModTemplate', version: '2.+', changing: true
+    }
+}
+plugins {
+    id("java")
+    id("org.spongepowered.gradle.vanilla") version "0.2"
+}
+apply plugin: 'com.blamejared.modtemplate'
+import com.blamejared.modtemplate.Utils
+
+archivesBaseName = "${mod_name}-common-${minecraft_version}"
+version = Utils.updatingVersion(mod_version)
+group = mod_group
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+}
+
+minecraft {
+    version(minecraft_version) // or: latestRelease() or latestSnapshot()
+    runs {
+        server()
+        client()
+    }
+}
+dependencies {
+    implementation "org.spongepowered:mixin:0.8.4"
+}
