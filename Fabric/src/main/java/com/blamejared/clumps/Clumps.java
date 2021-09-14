@@ -6,8 +6,7 @@ public class Clumps implements ModInitializer {
     
     @Override
     public void onInitialize() {
-        
-        ClumpsCommon.orbHelper = new OrbHelper();
+    
     }
     
 }

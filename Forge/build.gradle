@@ -109,10 +109,11 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.4-SNAPSHOT:processor'
 }
 
-jar {
-    dependsOn ":Common:compileJava"
-    from project(":Common").sourceSets.main.output
+tasks.withType(JavaCompile) {
+    source(project(":Common").sourceSets.main.allSource)
+}
 
+jar {
     manifest {
         attributes([
                 "Specification-Title"     : mod_name,

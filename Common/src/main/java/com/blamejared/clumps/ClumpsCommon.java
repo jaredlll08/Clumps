@@ -1,11 +1,12 @@
 package com.blamejared.clumps;
 
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.player.Player;
 
-import com.blamejared.clumps.helper.IOrbHelper;
-import com.blamejared.clumps.stub.StubOrbHelper;
+import java.util.function.BiPredicate;
 
 public class ClumpsCommon {
     
-    public static IOrbHelper orbHelper = new StubOrbHelper();
+    public static BiPredicate<Player, ExperienceOrb> pickupXPEvent = (player, experienceOrb) -> false;
     
 }

@@ -3,7 +3,8 @@ package com.blamejared.clumps.mixin;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.*;
+import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(ExperienceOrb.class)
 public interface ExperienceOrbAccess {
@@ -17,14 +18,6 @@ public interface ExperienceOrbAccess {
     @Accessor
     void setCount(int count);
     
-    @Accessor
-    int getCount();
-    
-    @Accessor
-    int getValue();
-    
-    @Invoker
-    int callRepairPlayerItems(Player param0, int param1);
     
     
 }
