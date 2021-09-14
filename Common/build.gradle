@@ -27,7 +27,7 @@ repositories {
 }
 
 minecraft {
-    version(minecraft_version) // or: latestRelease() or latestSnapshot()
+    version(minecraft_version)
     runs {
         server()
         client()
