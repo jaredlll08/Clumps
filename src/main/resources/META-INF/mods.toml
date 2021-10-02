@@ -13,3 +13,15 @@ authors="Jaredlll08"
 description='''
 Clumps xp orbs together.
 '''
+  [[dependencies.clumps]]
+    modId="forge"
+    mandatory=true
+    versionRange="[35,)"
+    ordering="NONE"
+    side="BOTH"
+  [[dependencies.clumps]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.4,)"
+    ordering="NONE"
+    side="BOTH"
