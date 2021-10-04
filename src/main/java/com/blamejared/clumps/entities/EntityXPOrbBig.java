@@ -54,6 +54,14 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
     
     @Override
     public void tick() {
+        // start Entity#tick
+        if (!this.world.isRemote) {
+            this.setFlag(6, this.isGlowing());
+        }
+    
+        this.baseTick();
+        // end Entity#tick
+        
         if(!world.isRemote && this.xpValue == 0) {
             this.remove();
             return;
