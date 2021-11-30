@@ -27,7 +27,7 @@ archivesBaseName = "${mod_name}-forge-${minecraft_version}"
 version = Utils.updatingVersion(mod_version)
 group = mod_group
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 mixin {
     add sourceSets.main, "clumps.refmap.json"
@@ -98,10 +98,6 @@ modTemplate {
     }
 }
 
-repositories {
-    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-}
-
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly project(":Common")
@@ -130,29 +126,6 @@ jar {
 
 jar.finalizedBy('reobfJar')
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    description = 'Creates a JAR containing the source code.'
-    from sourceSets.main.allSource
-    archiveClassifier.set("sources")
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    description = 'Creates a JAR containing the JavaDocs.'
-    from javadoc.destinationDir
-    archiveClassifier.set("javadoc")
-}
-
-task deobfJar(type: Jar) {
-    description = 'Creates a JAR containing the non-obfuscated compiled code.'
-    from sourceSets.main.output
-    archiveClassifier.set("deobf")
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-    archives deobfJar
-}
 
 publish.dependsOn(project.tasks.getByName("assemble"))
 publish.mustRunAfter(project.tasks.getByName("build"))
@@ -179,18 +152,6 @@ publishing {
                 }
             }
 
-            artifact sourcesJar {
-
-                classifier 'sources'
-            }
-            artifact javadocJar {
-
-                classifier 'javadoc'
-            }
-            artifact deobfJar {
-
-                classifier 'deobf'
-            }
         }
     }
 
@@ -216,7 +177,7 @@ curseforge {
 
 //        addArtifact(sourcesJar)
 //        addArtifact(javadocJar)
-        addArtifact(deobfJar)
+//        addArtifact(deobfJar)
     }
 }
 
