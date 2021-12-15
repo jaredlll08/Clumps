@@ -158,6 +158,7 @@ publishing {
     repositories {
 
         maven {
+            project.properties
 
             url "file://" + System.getenv("local_maven")
         }

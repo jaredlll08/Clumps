@@ -20,6 +20,7 @@ build
 # other
 eclipse
 run
+run_server
 secrets.json
 changelog.md
 *.launch
