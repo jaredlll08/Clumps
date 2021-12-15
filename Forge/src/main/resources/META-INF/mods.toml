@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[38,)"
+loaderVersion="[39,)"
 issueTrackerURL="https://github.com/jaredlll08/Clumps/issues"
 license="MIT"
 [[mods]] #mandatory
@@ -16,12 +16,12 @@ Clumps xp orbs together.
   [[dependencies.clumps]]
 	modId="forge"
 	mandatory=true
-	versionRange="[38.0.0,)"
+	versionRange="[39.0.0,)"
 	ordering="NONE"
 	side="BOTH"
   [[dependencies.clumps]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18,)"
+    versionRange="[1.18.1,)"
     ordering="NONE"
     side="BOTH"
