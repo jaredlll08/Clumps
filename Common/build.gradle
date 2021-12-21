@@ -16,6 +16,7 @@ plugins {
 }
 
 apply plugin: 'com.blamejared.modtemplate'
+apply plugin: 'maven-publish'
 
 import com.blamejared.modtemplate.Utils
 
@@ -44,4 +45,39 @@ minecraft {
 }
 dependencies {
     compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.4'
+}
+
+publishing {
+
+    publications {
+
+        mavenJava(MavenPublication) {
+
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+            from components.java
+
+            // Allows the maven pom file to be modified.
+            pom.withXml {
+
+                // Go through all the dependencies.
+                asNode().dependencies.dependency.each { dep ->
+
+                    println 'Surpressing artifact ' + dep.artifactId.last().value().last() + ' from maven dependencies.'
+                    assert dep.parent().remove(dep)
+                }
+            }
+
+        }
+    }
+
+    repositories {
+
+        maven {
+            project.properties
+
+            url "file://" + System.getenv("local_maven")
+        }
+    }
 }
