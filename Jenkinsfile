@@ -41,7 +41,7 @@ pipeline {
                     sh './gradlew publish'
 
                     echo 'Deploying to CurseForge'
-                    sh './gradlew curseforge'
+                    sh './gradlew publishCurseForge postDiscord'
                 }
             }
         }
