@@ -146,7 +146,7 @@ public class EntityXPOrbBig extends ExperienceOrbEntity implements IEntityAdditi
                         EntityXPOrbBig newOrb = new EntityXPOrbBig(world, getPosX(), getPosY(), getPosZ(), newSize, newClumpedMap);
                         MinecraftForge.EVENT_BUS.post(new EXPMergeEvent(this, orb, newOrb));
                         
-                        newOrb.setMotion(0, 0, 0);
+                        newOrb.setMotion(this.getMotion());
                         world.addEntity(newOrb);
                         remove();
                     }
