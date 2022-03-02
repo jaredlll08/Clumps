@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[39,)"
+loaderVersion="[40,)"
 issueTrackerURL="https://github.com/jaredlll08/Clumps/issues"
 license="MIT"
 [[mods]] #mandatory
@@ -7,7 +7,7 @@ modId="clumps"
 version="${file.jarVersion}"
 displayName="Clumps"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/clumps"
-updateJSONURL="https://updates.blamejared.com/get?n=clumps&gv=1.18"
+updateJSONURL="https://updates.blamejared.com/get?n=clumps&gv=1.18.2"
 credits=""
 authors="Jaredlll08"
 description='''
@@ -16,12 +16,12 @@ Clumps xp orbs together.
   [[dependencies.clumps]]
 	modId="forge"
 	mandatory=true
-	versionRange="[39.0.0,)"
+	versionRange="[40.0.0,)"
 	ordering="NONE"
 	side="BOTH"
   [[dependencies.clumps]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18.1,)"
+    versionRange="[1.18.2,)"
     ordering="NONE"
     side="BOTH"
