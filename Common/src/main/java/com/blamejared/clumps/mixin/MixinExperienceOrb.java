@@ -43,7 +43,7 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
     protected abstract int repairPlayerItems(Player player, int i);
     
     @Shadow
-    private static boolean canMerge(ExperienceOrb experienceOrb, int i, int j) {
+    private static boolean canMerge(ExperienceOrb experienceOrb, int id, int value) {
         
         return false;
     }
@@ -109,15 +109,15 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
     
     
     @Inject(method = "tryMergeToExisting(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)Z", at = @At(value = "HEAD"), cancellable = true)
-    private static void tryMergeToExisting(ServerLevel serverLevel, Vec3 vec3, int i, CallbackInfoReturnable<Boolean> cir) {
+    private static void tryMergeToExisting(ServerLevel serverLevel, Vec3 vec3, int value, CallbackInfoReturnable<Boolean> cir) {
         
         AABB aABB = AABB.ofSize(vec3, 1.0D, 1.0D, 1.0D);
-        int j = serverLevel.getRandom().nextInt(40);
-        List<ExperienceOrb> list = serverLevel.getEntities(EntityTypeTest.forClass(ExperienceOrb.class), aABB, (experienceOrbx) -> canMerge(experienceOrbx, j, i));
+        int id = serverLevel.getRandom().nextInt(40);
+        List<ExperienceOrb> list = serverLevel.getEntities(EntityTypeTest.forClass(ExperienceOrb.class), aABB, (experienceOrbx) -> canMerge(experienceOrbx, id, value));
         if(!list.isEmpty()) {
             ExperienceOrb experienceOrb = list.get(0);
             Map<Integer, Integer> clumpedMap = ((IClumpedOrb) experienceOrb).clumps$getClumpedMap();
-            clumpedMap = Stream.of(clumpedMap, Collections.singletonMap(i, 1))
+            clumpedMap = Stream.of(clumpedMap, Collections.singletonMap(value, 1))
                     .flatMap(map -> map.entrySet().stream())
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
             ((IClumpedOrb) experienceOrb).clumps$setClumpedMap(clumpedMap);

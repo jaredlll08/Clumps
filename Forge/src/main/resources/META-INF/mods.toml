@@ -2,7 +2,7 @@ modLoader="javafml"
 loaderVersion="[40,)"
 issueTrackerURL="https://github.com/jaredlll08/Clumps/issues"
 license="MIT"
-[[mods]] #mandatory
+[[mods]]
 modId="clumps"
 version="${file.jarVersion}"
 displayName="Clumps"
