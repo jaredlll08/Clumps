@@ -41,7 +41,7 @@ mixin {
 }
 
 minecraft {
-    mappings("parchment", "2021.12.19-1.18.1")
+    mappings("official", "1.19")
 
     runs {
         create("client") {

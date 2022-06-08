@@ -4,7 +4,7 @@ import net.darkhax.curseforgegradle.Constants as CFG_Contants
 
 plugins {
     `maven-publish`
-    id("fabric-loom") version "0.10-SNAPSHOT"
+    id("fabric-loom") version "0.12-SNAPSHOT"
     id("com.blamejared.modtemplate")
     id("net.darkhax.curseforgegradle") version ("1.0.8")
 }
@@ -33,7 +33,7 @@ dependencies {
     minecraft("com.mojang:minecraft:${minecraftVersion}")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-1.18.1:2021.12.19@zip")
+        parchment("org.parchmentmc.data:parchment-1.18.2:2022.06.05@zip")
     })
     modImplementation("net.fabricmc:fabric-loader:${fabricLoaderVersion}")
     implementation(project(":Common"))

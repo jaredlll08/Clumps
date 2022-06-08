@@ -20,8 +20,8 @@
         ]
     },
     "depends": {
-        "fabricloader": ">=0.13",
-        "minecraft": "1.18.x"
+        "fabricloader": ">=0.14",
+        "minecraft": "1.19.x"
     },
     "custom": {},
     "mixins": [{
