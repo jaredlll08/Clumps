@@ -76,6 +76,11 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
             if(ClumpsCommon.pickupXPEvent.test(player, (ExperienceOrb) (Entity) this)) {
                 return;
             }
+            System.out.println(clumps$clumpedMap.entrySet()
+                    .stream()
+                    .map(entry -> entry.getKey() * entry.getValue())
+                    .reduce(Integer::sum)
+                    .orElse(1));
             player.takeXpDelay = 0;
             player.take(this, 1);
             
@@ -98,11 +103,11 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
     public void merge(ExperienceOrb secondaryOrb, CallbackInfo ci) {
         
         Map<Integer, Integer> otherMap = ((IClumpedOrb) secondaryOrb).clumps$getClumpedMap();
-        clumps$clumpedMap = Stream.of(clumps$getClumpedMap(), otherMap)
+        clumps$setClumpedMap(Stream.of(clumps$getClumpedMap(), otherMap)
                 .flatMap(map -> map.entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum)));
         this.count = clumps$getClumpedMap().values().stream().reduce(Integer::sum).orElse(1);
-        this.age = Math.min(this.age, ((ExperienceOrbAccess) secondaryOrb).getAge());
+        this.age = Math.min(this.age, ((ExperienceOrbAccess) secondaryOrb).clumps$getAge());
         secondaryOrb.discard();
         ci.cancel();
     }
@@ -117,12 +122,12 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
         if(!list.isEmpty()) {
             ExperienceOrb experienceOrb = list.get(0);
             Map<Integer, Integer> clumpedMap = ((IClumpedOrb) experienceOrb).clumps$getClumpedMap();
-            clumpedMap = Stream.of(clumpedMap, Collections.singletonMap(value, 1))
+            ((IClumpedOrb) experienceOrb).clumps$setClumpedMap(Stream.of(clumpedMap, Collections.singletonMap(value, 1))
                     .flatMap(map -> map.entrySet().stream())
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum)));
             ((IClumpedOrb) experienceOrb).clumps$setClumpedMap(clumpedMap);
-            ((ExperienceOrbAccess) experienceOrb).setCount(clumpedMap.values().stream().reduce(Integer::sum).orElse(1));
-            ((ExperienceOrbAccess) experienceOrb).setAge(0);
+            ((ExperienceOrbAccess) experienceOrb).clumps$setCount(clumpedMap.values().stream().reduce(Integer::sum).orElse(1));
+            ((ExperienceOrbAccess) experienceOrb).clumps$setAge(0);
             cir.setReturnValue(true);
         } else {
             cir.setReturnValue(false);
@@ -169,6 +174,11 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
     public void clumps$setClumpedMap(Map<Integer, Integer> map) {
         
         clumps$clumpedMap = map;
+        value = clumps$clumpedMap.entrySet()
+                .stream()
+                .map(entry -> entry.getKey() * entry.getValue())
+                .reduce(Integer::sum)
+                .orElse(1);
     }
     
 }

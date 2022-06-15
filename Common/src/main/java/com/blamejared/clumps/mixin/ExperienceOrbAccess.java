@@ -7,14 +7,13 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(ExperienceOrb.class)
 public interface ExperienceOrbAccess {
     
-    @Accessor
-    int getAge();
+    @Accessor("age")
+    int clumps$getAge();
     
-    @Accessor
-    void setAge(int age);
+    @Accessor("age")
+    void clumps$setAge(int age);
     
-    @Accessor
-    void setCount(int count);
-    
+    @Accessor("count")
+    void clumps$setCount(int count);
     
 }
