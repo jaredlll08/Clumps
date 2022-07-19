@@ -10,6 +10,7 @@ displayURL="https://www.curseforge.com/minecraft/mc-mods/clumps"
 updateJSONURL="https://updates.blamejared.com/get?n=clumps&gv=1.18.2"
 credits=""
 authors="Jaredlll08"
+logoFile="icon.png"
 description='''
 Clumps xp orbs together.
 '''
