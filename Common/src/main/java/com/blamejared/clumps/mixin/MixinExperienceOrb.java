@@ -1,7 +1,10 @@
 package com.blamejared.clumps.mixin;
 
 import com.blamejared.clumps.ClumpsCommon;
+import com.blamejared.clumps.api.events.IValueEvent;
 import com.blamejared.clumps.helper.IClumpedOrb;
+import com.blamejared.clumps.platform.Services;
+import com.mojang.datafixers.util.Either;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -24,6 +27,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -80,8 +85,11 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
             player.take(this, 1);
             
             clumps$getClumpedMap().forEach((value, amount) -> {
+                Either<IValueEvent, Integer> result = Services.EVENT.fireValueEvent(value);
+                int actualValue = result.map(IValueEvent::getValue, UnaryOperator.identity());
+                
                 for(int i = 0; i < amount; i++) {
-                    int leftOver = this.repairPlayerItems(player, value);
+                    int leftOver = this.repairPlayerItems(player, actualValue);
                     if(leftOver > 0) {
                         player.giveExperiencePoints(leftOver);
                     }

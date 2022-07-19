@@ -12,6 +12,7 @@ plugins {
 val modVersion: String by project
 val minecraftVersion: String by project
 val fabricLoaderVersion: String by project
+val fabricVersion: String by project
 val modName: String by project
 val modAuthor: String by project
 val modId: String by project
@@ -36,6 +37,7 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-1.18.2:2022.06.05@zip")
     })
     modImplementation("net.fabricmc:fabric-loader:${fabricLoaderVersion}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricVersion}")
     implementation(project(":Common"))
 }
 
