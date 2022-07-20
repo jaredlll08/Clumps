@@ -13,10 +13,9 @@ public class FabricEventHandler implements IEventHelper {
     @Override
     public Either<IValueEvent, Integer> fireValueEvent(int value) {
         
-        ValueEvent event = new ValueEvent();
+        ValueEvent event = new ValueEvent(value);
         if(FabricLoader.getInstance().isModLoaded("fabric")) {
             ClumpsEvents.VALUE_EVENT.invoker().handle(event);
-            return Either.right(event.getValue());
         }
         
         return Either.right(event.getValue());

@@ -8,6 +8,11 @@ public class ValueEvent implements IValueEvent {
     
     private int value;
     
+    public ValueEvent(int value) {
+        
+        this.value = value;
+    }
+    
     /**
      * Sets the value of the experience orb.
      *
