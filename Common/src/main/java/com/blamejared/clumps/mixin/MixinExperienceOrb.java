@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,7 +84,7 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
             player.take(this, 1);
             
             clumps$getClumpedMap().forEach((value, amount) -> {
-                Either<IValueEvent, Integer> result = Services.EVENT.fireValueEvent(value);
+                Either<IValueEvent, Integer> result = Services.EVENT.fireValueEvent(player, value);
                 int actualValue = result.map(IValueEvent::getValue, UnaryOperator.identity());
                 
                 for(int i = 0; i < amount; i++) {
@@ -128,7 +127,10 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
             ((IClumpedOrb) experienceOrb).clumps$setClumpedMap(Stream.of(clumpedMap, Collections.singletonMap(value, 1))
                     .flatMap(map -> map.entrySet().stream())
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum)));
-            ((ExperienceOrbAccess) experienceOrb).clumps$setCount(clumpedMap.values().stream().reduce(Integer::sum).orElse(1));
+            ((ExperienceOrbAccess) experienceOrb).clumps$setCount(clumpedMap.values()
+                    .stream()
+                    .reduce(Integer::sum)
+                    .orElse(1));
             ((ExperienceOrbAccess) experienceOrb).clumps$setAge(0);
             cir.setReturnValue(true);
         } else {

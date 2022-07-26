@@ -1,15 +1,18 @@
-
 package com.blamejared.clumps.api.events;
+
+import net.minecraft.world.entity.player.Player;
 
 /**
  * Used to mutate the value of experience before repairing player's items and giving the rest to the player.
  */
 public class ValueEvent implements IValueEvent {
     
+    private final Player player;
     private int value;
     
-    public ValueEvent(int value) {
+    public ValueEvent(Player player, int value) {
         
+        this.player = player;
         this.value = value;
     }
     
@@ -27,12 +30,23 @@ public class ValueEvent implements IValueEvent {
     /**
      * Gets the value of the experience orb.
      *
-     * @return the value of the experience orb.
+     * @return The value of the experience orb.
      */
     @Override
     public int getValue() {
         
-        return value;
+        return this.value;
+    }
+    
+    /**
+     * Gets the player that the experience is being given to.
+     *
+     * @return The player the experience is being given to.
+     */
+    @Override
+    public Player getPlayer() {
+        
+        return this.player;
     }
     
 }
