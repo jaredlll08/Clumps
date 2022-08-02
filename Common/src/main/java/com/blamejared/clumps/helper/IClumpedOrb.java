@@ -8,4 +8,8 @@ public interface IClumpedOrb {
     
     void clumps$setClumpedMap(Map<Integer, Integer> map);
     
+    default boolean clumps$resolve() {
+        return false;
+    }
+    
 }
