@@ -11,6 +11,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
@@ -23,10 +26,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,6 +52,12 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
         
         return false;
     }
+    
+    @Shadow
+    protected abstract int xpToDurability(int $$0);
+    
+    @Shadow
+    protected abstract int durabilityToXp(int $$0);
     
     @Unique
     public Map<Integer, Integer> clumps$clumpedMap;
@@ -83,33 +90,52 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
             player.takeXpDelay = 0;
             player.take(this, 1);
             
-            clumps$getClumpedMap().forEach((value, amount) -> {
-                Either<IValueEvent, Integer> result = Services.EVENT.fireValueEvent(player, value);
-                int actualValue = result.map(IValueEvent::getValue, UnaryOperator.identity());
-                
-                for(int i = 0; i < amount; i++) {
-                    int leftOver = this.repairPlayerItems(player, actualValue);
-                    if(leftOver > 0) {
-                        player.giveExperiencePoints(leftOver);
+            if(this.value != 0 || clumps$resolve()) {
+                AtomicInteger toGive = new AtomicInteger();
+                clumps$getClumpedMap().forEach((value, amount) -> {
+                    Either<IValueEvent, Integer> result = Services.EVENT.fireValueEvent(player, value);
+                    int actualValue = result.map(IValueEvent::getValue, UnaryOperator.identity());
+                    
+                    for(int i = 0; i < amount; i++) {
+                        int leftOver = this.repairPlayerItems(player, actualValue);
+                        if(leftOver > 0) {
+                            toGive.addAndGet(leftOver);
+                        }
                     }
+                });
+                if(toGive.get() > 0) {
+                    player.giveExperiencePoints(toGive.get());
                 }
-            });
-            
+            }
             this.discard();
             ci.cancel();
         }
+    }
+    
+    
+    @Inject(method = "repairPlayerItems", at = @At(value = "HEAD"), cancellable = true)
+    public void clumps$repairPlayerItems(Player player, int actualValue, CallbackInfoReturnable<Integer> cir) {
         
+        cir.setReturnValue(Optional.ofNullable(EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player, ItemStack::isDamaged))
+                .map(Map.Entry::getValue)
+                .map(foundItem -> {
+                    int toRepair = Math.min(this.xpToDurability(actualValue), foundItem.getDamageValue());
+                    foundItem.setDamageValue(foundItem.getDamageValue() - toRepair);
+                    int used = actualValue - this.durabilityToXp(toRepair);
+                    return used > 0 ? this.repairPlayerItems(player, used) : 0;
+                })
+                .orElse(actualValue));
     }
     
     @Inject(method = "merge(Lnet/minecraft/world/entity/ExperienceOrb;)V", at = @At(value = "INVOKE", target = "net/minecraft/world/entity/ExperienceOrb.discard()V", shift = At.Shift.BEFORE), cancellable = true)
     public void merge(ExperienceOrb secondaryOrb, CallbackInfo ci) {
         
         Map<Integer, Integer> otherMap = ((IClumpedOrb) secondaryOrb).clumps$getClumpedMap();
+        this.count = clumps$getClumpedMap().values().stream().reduce(Integer::sum).orElse(1);
+        this.age = Math.min(this.age, ((ExperienceOrbAccess) secondaryOrb).clumps$getAge());
         clumps$setClumpedMap(Stream.of(clumps$getClumpedMap(), otherMap)
                 .flatMap(map -> map.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum)));
-        this.count = clumps$getClumpedMap().values().stream().reduce(Integer::sum).orElse(1);
-        this.age = Math.min(this.age, ((ExperienceOrbAccess) secondaryOrb).clumps$getAge());
         secondaryOrb.discard();
         ci.cancel();
     }
@@ -178,11 +204,18 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
     public void clumps$setClumpedMap(Map<Integer, Integer> map) {
         
         clumps$clumpedMap = map;
+        clumps$resolve();
+    }
+    
+    @Override
+    public boolean clumps$resolve() {
+        
         value = clumps$getClumpedMap().entrySet()
                 .stream()
                 .map(entry -> entry.getKey() * entry.getValue())
                 .reduce(Integer::sum)
                 .orElse(1);
+        return value > 0;
     }
     
 }
