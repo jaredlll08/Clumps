@@ -41,7 +41,7 @@ mixin {
 }
 
 minecraft {
-    mappings("official", "1.19.1")
+    mappings("official", "1.19.2")
 
     runs {
         create("client") {
