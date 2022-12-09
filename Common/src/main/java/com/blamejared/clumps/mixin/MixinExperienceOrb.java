@@ -9,11 +9,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
@@ -23,16 +22,22 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Mixin(ExperienceOrb.class)
+@Mixin(value = ExperienceOrb.class, priority = 1001)
 public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
     
     @Shadow
@@ -61,6 +66,9 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
     
     @Unique
     public Map<Integer, Integer> clumps$clumpedMap;
+    
+    @Unique
+    public Map.Entry<EquipmentSlot, ItemStack> clumps$currentEntry;
     
     public MixinExperienceOrb(EntityType<?> entityType, Level level) {
         
@@ -112,14 +120,22 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
         }
     }
     
+    @ModifyVariable(index = 3, method = "repairPlayerItems", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;getRandomItemWith(Lnet/minecraft/world/item/enchantment/Enchantment;Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Predicate;)Ljava/util/Map$Entry;"))
+    public Map.Entry<EquipmentSlot, ItemStack> clumps$captureCurrentEntry(Map.Entry<EquipmentSlot, ItemStack> entry) {
+        
+        clumps$currentEntry = entry;
+        return entry;
+    }
     
-    @Inject(method = "repairPlayerItems", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "repairPlayerItems", cancellable = true, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;getRandomItemWith(Lnet/minecraft/world/item/enchantment/Enchantment;Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Predicate;)Ljava/util/Map$Entry;"))
     public void clumps$repairPlayerItems(Player player, int actualValue, CallbackInfoReturnable<Integer> cir) {
         
-        cir.setReturnValue(Optional.ofNullable(EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player, ItemStack::isDamaged))
+        cir.setReturnValue(Optional.ofNullable(clumps$currentEntry)
                 .map(Map.Entry::getValue)
                 .map(foundItem -> {
-                    int toRepair = Math.min(this.xpToDurability(actualValue), foundItem.getDamageValue());
+                    BiFunction<ItemStack, Integer, Float> repairRatio = Services.PLATFORM.getRepairRatio((itemStack, integer) -> (float) this.xpToDurability(integer));
+                    int toRepair = Math.min(repairRatio.apply(foundItem, actualValue)
+                            .intValue(), foundItem.getDamageValue());
                     foundItem.setDamageValue(foundItem.getDamageValue() - toRepair);
                     int used = actualValue - this.durabilityToXp(toRepair);
                     return used > 0 ? this.repairPlayerItems(player, used) : 0;
