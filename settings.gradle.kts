@@ -11,9 +11,6 @@ pluginManagement {
     }
     resolutionStrategy {
         eachPlugin {
-            if (requested.id.id == "net.minecraftforge.gradle") {
-                useModule("${requested.id}:ForgeGradle:${requested.version}")
-            }
             if (requested.id.id == "org.spongepowered.mixin") {
                 useModule("org.spongepowered:mixingradle:${requested.version}")
             }
@@ -21,6 +18,6 @@ pluginManagement {
     }
 }
 rootProject.name = "Clumps"
-include("Common")
-include("Fabric")
-include("Forge")
+include("common")
+include("fabric")
+include("forge")

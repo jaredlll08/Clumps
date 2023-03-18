@@ -7,7 +7,7 @@ modId="clumps"
 version="${file.jarVersion}"
 displayName="Clumps"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/clumps"
-updateJSONURL="https://updates.blamejared.com/get?n=clumps&gv=1.19.3"
+updateJSONURL="https://updates.blamejared.com/get?n=clumps&gv=1.19.4"
 credits=""
 authors="Jaredlll08"
 logoFile="icon.png"
@@ -17,7 +17,7 @@ Clumps xp orbs together.
   [[dependencies.clumps]]
 	modId="forge"
 	mandatory=true
-	versionRange="[41.0.0,)"
+	versionRange="[45.0.0,)"
 	ordering="NONE"
 	side="BOTH"
   [[dependencies.clumps]]
