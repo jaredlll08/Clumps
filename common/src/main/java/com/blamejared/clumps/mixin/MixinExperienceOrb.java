@@ -1,6 +1,7 @@
 package com.blamejared.clumps.mixin;
 
 import com.blamejared.clumps.ClumpsCommon;
+import com.blamejared.clumps.api.events.IRepairEvent;
 import com.blamejared.clumps.api.events.IValueEvent;
 import com.blamejared.clumps.helper.IClumpedOrb;
 import com.blamejared.clumps.platform.Services;
@@ -105,7 +106,11 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
                     int actualValue = result.map(IValueEvent::getValue, UnaryOperator.identity());
                     
                     for(int i = 0; i < amount; i++) {
-                        int leftOver = this.repairPlayerItems(player, actualValue);
+                        int leftOver = Services.EVENT.fireRepairEvent(player, actualValue)
+                                .map(IRepairEvent::getValue, UnaryOperator.identity());
+                        if(leftOver == actualValue) {
+                            leftOver = this.repairPlayerItems(player, actualValue);
+                        }
                         if(leftOver > 0) {
                             toGive.addAndGet(leftOver);
                         }

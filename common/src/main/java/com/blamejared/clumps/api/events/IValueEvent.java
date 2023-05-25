@@ -4,6 +4,9 @@ import net.minecraft.world.entity.player.Player;
 
 /**
  * Used to mutate the value of experience before repairing player's items and giving the rest to the player.
+ * **NOTE** This mutates the actual value of the experience orb, it is fired once per *value*, not per orb inside the clumped orb.
+ * For example, given the orb: {5: 10}, which is an orb that has clumped 10 other orbs who had the value of 5, this even will fire once
+ * if this event is used to change that 5 to a 7, the orb will *effectively* turn into {7: 10}
  */
 public interface IValueEvent {
     

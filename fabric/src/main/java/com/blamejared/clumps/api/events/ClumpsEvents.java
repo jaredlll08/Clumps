@@ -12,4 +12,11 @@ public class ClumpsEvents {
         return null;
     });
     
+    public static final Event<IEventHandler<RepairEvent, Void>> REPAIR_EVENT = EventFactory.createArrayBacked(IEventHandler.class, listeners -> event -> {
+        for(IEventHandler<RepairEvent, Void> listener : listeners) {
+            listener.handle(event);
+        }
+        return null;
+    });
+    
 }
