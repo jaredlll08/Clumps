@@ -1,6 +1,6 @@
 package com.blamejared.clumps.gradle
 
-import com.blamejared.modtemplate.Utils
+import com.blamejared.gradle.mod.utils.GMUtils
 import groovy.namespace.QName
 import groovy.util.Node
 import groovy.util.NodeList
@@ -43,7 +43,7 @@ class DefaultPlugin : Plugin<Project> {
         val base = project.extensions.getByType(BasePluginExtension::class.java)
 
         base.archivesName.set("${Properties.NAME}-${project.name.toLowerCase()}-${Versions.MINECRAFT}")
-        project.version = Utils.updatingVersion(Versions.MOD)
+        project.version = GMUtils.updatingVersion(Versions.MOD)
         project.group = Properties.GROUP
 
         project.tasks.withType<GenerateModuleMetadata>().all {

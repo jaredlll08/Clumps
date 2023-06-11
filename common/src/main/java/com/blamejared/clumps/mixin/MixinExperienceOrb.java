@@ -91,7 +91,7 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
     @Inject(method = "playerTouch(Lnet/minecraft/world/entity/player/Player;)V", at = @At(value = "HEAD"), cancellable = true)
     public void playerTouch(Player player, CallbackInfo ci) {
         
-        if(!this.level.isClientSide) {
+        if(!this.level().isClientSide) {
             // Fire the Forge event
             if(ClumpsCommon.pickupXPEvent.test(player, (ExperienceOrb) (Entity) this)) {
                 return;

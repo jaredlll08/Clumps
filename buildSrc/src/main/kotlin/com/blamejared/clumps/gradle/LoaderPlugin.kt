@@ -1,8 +1,7 @@
 package com.blamejared.clumps.gradle
 
-import com.blamejared.modtemplate.ModTemplatePlugin
-import com.blamejared.modtemplate.Utils
-import com.blamejared.modtemplate.extensions.ModTemplateExtension
+import com.blamejared.gradle.mod.utils.GradleModUtilsPlugin
+import com.blamejared.gradle.mod.utils.extensions.VersionTrackerExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
@@ -20,7 +19,7 @@ class LoaderPlugin : Plugin<Project> {
 
         applyJavaPlugin(project)
         applyDependencies(project)
-        applyModTemplate(project)
+        applyGradleModUtils(project)
     }
 
     private fun applyJavaPlugin(project: Project) {
@@ -55,31 +54,15 @@ class LoaderPlugin : Plugin<Project> {
     private fun applyDependencies(project: Project) {
     }
 
-    private fun applyModTemplate(project: Project) {
+    private fun applyGradleModUtils(project: Project) {
 
-        project.plugins.apply(ModTemplatePlugin::class.java)
+        project.plugins.apply(GradleModUtilsPlugin::class.java)
 
-        with(project.extensions.getByType(ModTemplateExtension::class.java)) {
-            mcVersion(Versions.MINECRAFT)
-            curseHomepage(Properties.CURSE_HOMEPAGE)
-            displayName(Properties.NAME)
-            modLoader(project.name)
-            changelog {
-                // Don't register the task since we will never use it, but the properties are used
-                enabled(false)
-                firstCommit(Properties.FIRST_COMMIT)
-                repo(Properties.GIT_REPO)
-            }
-
-            versionTracker {
-                enabled(true)
-                endpoint(Utils.locateProperty(project, "versionTrackerAPI"))
-                author(Properties.AUTHOR)
-                projectName("${Properties.NAME}-${project.name}")
-                homepage(Properties.CURSE_HOMEPAGE)
-                uid(Utils.locateProperty(project, "versionTrackerKey"))
-            }
-
+        with(project.extensions.getByType(VersionTrackerExtension::class.java)) {
+            mcVersion.set(Versions.MINECRAFT)
+            homepage.set(Properties.CURSE_HOMEPAGE)
+            author.set(Properties.AUTHOR)
+            projectName.set("${Properties.NAME}-${project.name}")
         }
     }
 

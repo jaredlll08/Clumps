@@ -6,6 +6,7 @@ pipeline {
         jdk "jdk-17.0.1"
     }
     environment {
+        modrinth_token = credentials('modrinth_token')
         curseforgeApiToken = credentials('curseforge_token')
         discordCFWebhook = credentials('discord_cf_webhook')
         versionTrackerKey = credentials('version_tracker_key')
@@ -25,11 +26,6 @@ pipeline {
                 sh './gradlew build'
             }
         }
-        stage('Git Changelog') {
-            steps {
-                sh './gradlew genGitChangelog'
-            }
-        }
 
         stage('Publish') {
             steps {
@@ -40,7 +36,7 @@ pipeline {
                 sh './gradlew publish'
 
                 echo 'Deploying to CurseForge'
-                sh './gradlew publishCurseForge postDiscord'
+                sh './gradlew publishCurseForge modrinth postDiscord'
             }
         }
     }

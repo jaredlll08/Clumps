@@ -1,14 +1,15 @@
 import com.blamejared.clumps.gradle.Properties
 import com.blamejared.clumps.gradle.Versions
-import com.blamejared.modtemplate.Utils
+import com.blamejared.gradle.mod.utils.GMUtils
 import net.darkhax.curseforgegradle.TaskPublishCurseForge
 import net.darkhax.curseforgegradle.Constants as CFG_Constants
 
 plugins {
     id("com.blamejared.clumps.default")
     id("com.blamejared.clumps.loader")
-    id("net.minecraftforge.gradle") version ("5.1.+")
+    id("net.minecraftforge.gradle") version ("[6.0,6.2)")
     id("org.spongepowered.mixin") version ("0.7-SNAPSHOT")
+    id("com.modrinth.minotaur")
 }
 
 mixin {
@@ -41,15 +42,24 @@ dependencies {
 }
 
 tasks.create<TaskPublishCurseForge>("publishCurseForge") {
-    apiToken = Utils.locateProperty(project, "curseforgeApiToken") ?: 0
+    apiToken = GMUtils.locateProperty(project, "curseforgeApiToken") ?: 0
 
     val mainFile = upload(Properties.CURSE_PROJECT_ID, file("${project.buildDir}/libs/${base.archivesName.get()}-$version.jar"))
     mainFile.changelogType = "markdown"
-    mainFile.changelog = Utils.getFullChangelog(project)
+    mainFile.changelog = GMUtils.smallChangelog(project, Properties.GIT_REPO)
     mainFile.releaseType = CFG_Constants.RELEASE_TYPE_RELEASE
     mainFile.addJavaVersion("Java ${Versions.JAVA}")
 
     doLast {
         project.ext.set("curse_file_url", "${Properties.CURSE_HOMEPAGE}/files/${mainFile.curseFileId}")
     }
+}
+
+modrinth {
+    token.set(GMUtils.locateProperty(project, "modrinth_token"))
+    projectId.set(Properties.MODRINTH_PROJECT_ID)
+    changelog.set(GMUtils.smallChangelog(project, Properties.GIT_REPO))
+    versionName.set("Forge-${Versions.MINECRAFT}-$version")
+    versionType.set("release")
+    uploadFile.set(tasks.jar.get())
 }

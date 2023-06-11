@@ -1,28 +1,16 @@
-modLoader="javafml"
-loaderVersion="[41,)"
-issueTrackerURL="https://github.com/jaredlll08/Clumps/issues"
-license="MIT"
+modLoader = "javafml"
+loaderVersion = "[41,)"
+issueTrackerURL = "https://github.com/jaredlll08/Clumps/issues"
+license = "MIT"
 [[mods]]
-modId="clumps"
-version="${file.jarVersion}"
-displayName="Clumps"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/clumps"
-updateJSONURL="https://updates.blamejared.com/get?n=clumps&gv=1.19.4"
-credits=""
-authors="Jaredlll08"
-logoFile="icon.png"
-description='''
+modId = "clumps"
+version = "${file.jarVersion}"
+displayName = "Clumps"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/clumps"
+updateJSONURL = "https://updates.blamejared.com/get?n=clumps&gv=1.20"
+credits = ""
+authors = "Jaredlll08"
+logoFile = "icon.png"
+description = '''
 Clumps xp orbs together.
 '''
-  [[dependencies.clumps]]
-	modId="forge"
-	mandatory=true
-	versionRange="[45.0.0,)"
-	ordering="NONE"
-	side="BOTH"
-  [[dependencies.clumps]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.19,)"
-    ordering="NONE"
-    side="BOTH"
