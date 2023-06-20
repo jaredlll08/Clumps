@@ -62,7 +62,7 @@ class LoaderPlugin : Plugin<Project> {
             mcVersion.set(Versions.MINECRAFT)
             homepage.set(Properties.CURSE_HOMEPAGE)
             author.set(Properties.AUTHOR)
-            projectName.set("${Properties.NAME}-${project.name}")
+            projectName.set(Properties.NAME)
         }
     }
 
