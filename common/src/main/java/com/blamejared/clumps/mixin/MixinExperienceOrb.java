@@ -189,9 +189,11 @@ public abstract class MixinExperienceOrb extends Entity implements IClumpedOrb {
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     public void addAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
         
-        CompoundTag map = new CompoundTag();
-        clumps$getClumpedMap().forEach((value, count) -> map.putInt(value + "", count));
-        compoundTag.put("clumpedMap", map);
+        if(clumps$clumpedMap != null) {
+            CompoundTag map = new CompoundTag();
+            clumps$getClumpedMap().forEach((value, count) -> map.putInt(String.valueOf(value), count));
+            compoundTag.put("clumpedMap", map);
+        }
     }
     
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
