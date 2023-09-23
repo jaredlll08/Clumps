@@ -1,6 +1,7 @@
 import com.blamejared.clumps.gradle.Versions
 
 plugins {
+    java
     id("org.spongepowered.gradle.vanilla") version "0.2.1-SNAPSHOT"
     id("com.blamejared.clumps.default")
 }
