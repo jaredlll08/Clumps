@@ -1,6 +1,6 @@
 {
-    "pack": {
-        "description": "clumps resources",
-        "pack_format": 6
-    }
+  "pack": {
+    "description": "${NAME}",
+    "pack_format": 6
+  }
 }

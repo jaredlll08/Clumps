@@ -1,28 +1,24 @@
 {
   "schemaVersion": 1,
-  "id": "clumps",
+  "id": "${MODID}",
+  "name": "${NAME}",
   "version": "${version}",
-  "name": "Clumps",
-  "description": "Clumps xp orbs together.",
-  "icon": "assets/clumps/icon.png",
-  "authors": [
-    "Jaredlll08"
-  ],
-  "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/clumps",
-    "sources": "https://github.com/jaredlll08/clumps",
-    "issues": "https://github.com/jaredlll08/Clumps/issues"
-  },
-  "license": "MIT",
   "environment": "*",
+  "icon": "icon.png",
+  "authors": ["${AUTHOR}"],
+  "license": "MIT",
+  "contact": {
+    "homepage": "${CURSE_HOMEPAGE}",
+    "sources": "${GIT_REPO}",
+    "issues": "${GIT_REPO}/issues"
+  },
+  "description": "${DESCRIPTION}",
   "entrypoints": {
-    "main": [
-      "com.blamejared.clumps.Clumps"
-    ]
   },
   "depends": {
-    "fabricloader": ">=0.14",
-    "minecraft": "1.20.2"
+    "fabricloader": ">=${FABRIC_LOADER}",
+    "java": ">=${JAVA}",
+    "minecraft": "${MINECRAFT}"
   },
   "custom": {},
   "mixins": [

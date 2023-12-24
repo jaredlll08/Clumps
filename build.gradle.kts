@@ -9,12 +9,14 @@ import java.util.*
 
 plugins {
     `java-library`
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
 }
 
 version = GMUtils.updatingVersion(Versions.MOD)
 
 tasks.create("postDiscord") {
-
+    val taskName = "publishCurseForge"
+    dependsOn(":fabric:${taskName}", ":forge:${taskName}", ":neoforge:${taskName}")
     doLast {
         try {
 
@@ -30,13 +32,13 @@ tasks.create("postDiscord") {
             val embed = Embed()
             val downloadSources = StringJoiner("\n")
 
-            mapOf(Pair("fabric", "<:fabric:932163720568782878>"), Pair("forge", "<:forge:932163698003443804>"))
+            mapOf(Pair("fabric", "<:fabric:932163720568782878>"), Pair("forge", "<:forge:932163698003443804>"), Pair("neoforge", "<:neoforged:1184738260371644446>"))
                     .filter {
                         project(":${it.key}").ext.has("curse_file_url")
                     }.map { "${it.value} [${it.key.capitalize(Locale.ENGLISH)}](${project(":${it.key}").ext.get("curse_file_url")})" }
                     .forEach { downloadSources.add(it) }
 
-            listOf("common", "fabric", "forge")
+            listOf("common", "fabric", "forge", "neoforge")
                     .map { project(":${it}") }
                     .map { "<:maven:932165250738970634> `\"${it.group}:${it.base.archivesName.get()}:${it.version}\"`" }
                     .forEach { downloadSources.add(it) }

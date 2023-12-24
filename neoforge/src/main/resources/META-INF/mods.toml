@@ -1,10 +1,10 @@
 modLoader = "javafml"
-loaderVersion = "${FORGE_LOADER}"
+loaderVersion = "${NEO_FORGE_LOADER}"
 issueTrackerURL = "${GIT_REPO}/issues"
 license = "MIT"
 [[mods]]
 modId = "${MODID}"
-updateJSONURL = "https://updates.blamejared.com/get?n=${MODID}&gv=${MINECRAFT}&ml=forge"
+updateJSONURL = "https://updates.blamejared.com/get?n=${MODID}&gv=${MINECRAFT}&ml=neoforge"
 version = "${version}"
 displayName = "${NAME}"
 displayURL = "${CURSE_HOMEPAGE}"
@@ -12,10 +12,12 @@ authors = "${AUTHOR}"
 logoFile = "icon.png"
 description = '''${DESCRIPTION}'''
 itemIcon = "${ITEM_ICON}"
+[[mixins]]
+config = "${MODID}.mixins.json"
 [[dependencies.${MODID}]]
-modId = "forge"
+modId = "neoforge"
 mandatory = true
-versionRange = "${FORGE_LOADER}"
+versionRange = "${NEO_FORGE_LOADER}"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.${MODID}]]

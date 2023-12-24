@@ -103,17 +103,32 @@ class DefaultPlugin : Plugin<Project> {
             }
 
             withType<ProcessResources> {
-                outputs.upToDateWhen { false }
-                inputs.property("version", project.version)
-                filesMatching("*.mixins.json") {
-                    if (project.name == "fabric") {
-                        expand("refmap_target" to "${project.extensions.getByType(BasePluginExtension::class.java).archivesName.get()}-")
-                    } else {
-                        expand("refmap_target" to "${Properties.MODID}.")
-                    }
-                }
-                filesMatching("fabric.mod.json") {
-                    expand("version" to project.version)
+                val properties = mapOf(
+                        "version" to project.version,
+                        "MOD" to Versions.MOD,
+                        "JAVA" to Versions.JAVA,
+                        "MINECRAFT" to Versions.MINECRAFT,
+                        "FABRIC_LOADER" to Versions.FABRIC_LOADER,
+                        "FABRIC" to Versions.FABRIC,
+                        "FORGE" to Versions.FORGE,
+                        "FORGE_LOADER" to Versions.FORGE_LOADER,
+                        "NEO_FORGE" to Versions.NEO_FORGE,
+                        "NEO_FORGE_LOADER" to Versions.NEO_FORGE_LOADER,
+                        "GROUP" to Properties.GROUP,
+                        "NAME" to Properties.NAME,
+                        "AUTHOR" to Properties.AUTHOR,
+                        "MODID" to Properties.MODID,
+                        "AVATAR" to Properties.AVATAR,
+                        "CURSE_PROJECT_ID" to Properties.CURSE_PROJECT_ID,
+                        "CURSE_HOMEPAGE" to Properties.CURSE_HOMEPAGE,
+                        "MODRINTH_PROJECT_ID" to Properties.MODRINTH_PROJECT_ID,
+                        "GIT_REPO" to Properties.GIT_REPO,
+                        "DESCRIPTION" to Properties.DESCRIPTION,
+                        "ITEM_ICON" to Properties.ITEM_ICON,
+                )
+                inputs.properties(properties)
+                filesMatching(setOf("fabric.mod.json", "META-INF/mods.toml", "pack.mcmeta")) {
+                    expand(properties)
                 }
             }
 

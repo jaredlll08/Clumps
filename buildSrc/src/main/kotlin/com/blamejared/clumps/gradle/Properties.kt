@@ -11,4 +11,6 @@ object Properties {
     const val MODRINTH_PROJECT_ID = "Wnxd13zP"
     const val FIRST_COMMIT = "d484fbdd8ed5d541deae66e97db3ed427f1963d6"
     const val GIT_REPO = "https://github.com/jaredlll08/Clumps"
+    const val DESCRIPTION = "Clumps xp orbs together."
+    const val ITEM_ICON = "minecraft:experience_bottle"
 }

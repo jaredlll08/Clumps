@@ -4,6 +4,7 @@ import com.blamejared.gradle.mod.utils.GradleModUtilsPlugin
 import com.blamejared.gradle.mod.utils.extensions.VersionTrackerExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
@@ -26,15 +27,15 @@ class LoaderPlugin : Plugin<Project> {
         val commonJava = commonJava(project)
 
         project.tasks {
-            withType<ProcessResources> {
+            withType<ProcessResources>().matching { notNeoTask(it) }.configureEach {
                 from(commonJava.sourceSets.getByName("main").resources)
             }
 
-            withType<JavaCompile> {
+            withType<JavaCompile>().matching { notNeoTask(it) }.configureEach {
                 source(commonJava(project).sourceSets.getByName("main").allSource)
             }
 
-            withType<Javadoc> {
+            withType<Javadoc>().matching { notNeoTask(it) }.configureEach {
                 source(commonJava(project).sourceSets.getByName("main").allJava)
             }
 
@@ -64,6 +65,10 @@ class LoaderPlugin : Plugin<Project> {
             author.set(Properties.AUTHOR)
             projectName.set(Properties.NAME)
         }
+    }
+
+    private fun notNeoTask(task: Task): Boolean {
+        return !task.name.startsWith("neo")
     }
 
     private fun notCommon(project: Project): Boolean {
