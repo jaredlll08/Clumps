@@ -41,6 +41,12 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 }
 
+sourceSets.configureEach {
+    val dir = layout.buildDirectory.dir("sourcesSets/$this.name")
+    this.output.setResourcesDir(dir)
+    this.java.destinationDirectory.set(dir)
+}
+
 tasks.create<TaskPublishCurseForge>("publishCurseForge") {
     dependsOn(tasks.jar)
     apiToken = GMUtils.locateProperty(project, "curseforgeApiToken") ?: 0
