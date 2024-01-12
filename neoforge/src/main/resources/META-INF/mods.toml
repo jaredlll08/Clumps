@@ -16,13 +16,13 @@ itemIcon = "${ITEM_ICON}"
 config = "${MODID}.mixins.json"
 [[dependencies.${MODID}]]
 modId = "neoforge"
-mandatory = true
+type = "required"
 versionRange = "${NEO_FORGE_LOADER}"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.${MODID}]]
 modId = "minecraft"
-mandatory = true
+type = "required"
 versionRange = "[${MINECRAFT}]"
 ordering = "NONE"
 side = "BOTH"
