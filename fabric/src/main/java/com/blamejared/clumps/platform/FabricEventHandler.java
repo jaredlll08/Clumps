@@ -10,27 +10,26 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.entity.player.Player;
 
 public class FabricEventHandler implements IEventHelper {
-    
+
     @Override
     public Either<IValueEvent, Integer> fireValueEvent(Player player, int value) {
-        
         ValueEvent event = new ValueEvent(player, value);
-        if(FabricLoader.getInstance().isModLoaded("fabric")) {
+        if (FabricLoader.getInstance().isModLoaded("fabric")
+            || FabricLoader.getInstance().isModLoaded("fabric-api")) {
             ClumpsEvents.VALUE_EVENT.invoker().handle(event);
         }
-        
+
         return Either.right(event.getValue());
     }
-    
+
     @Override
     public Either<IRepairEvent, Integer> fireRepairEvent(Player player, int value) {
-        
         RepairEvent event = new RepairEvent(player, value);
-        if(FabricLoader.getInstance().isModLoaded("fabric")) {
+        if (FabricLoader.getInstance().isModLoaded("fabric")
+            || FabricLoader.getInstance().isModLoaded("fabric-api")) {
             ClumpsEvents.REPAIR_EVENT.invoker().handle(event);
         }
-        
+
         return Either.right(event.getValue());
     }
-    
 }
